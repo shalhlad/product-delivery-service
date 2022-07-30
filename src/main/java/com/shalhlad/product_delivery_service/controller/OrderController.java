@@ -59,7 +59,7 @@ public class OrderController {
   }
 
   @PatchMapping("/{id}")
-  @PreAuthorize("hasRole({'CUSTOMER', 'COLLECTOR', 'COURIER'})")
+  @PreAuthorize("hasAnyRole({'CUSTOMER', 'COLLECTOR', 'COURIER'})")
   public OrderDetailsDto changeState(
       Principal principal,
       @PathVariable Long id,

@@ -57,7 +57,7 @@ public class EmployeeController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize("hasRole({'ADMIN', 'DEPARTMENT_HEAD'})")
+  @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   public EmployeeDetailsDto recruitUser(
       Principal principal,
       @RequestBody @Valid UserRecruitRequestDto userRecruitRequestDto,
@@ -76,7 +76,7 @@ public class EmployeeController {
   }
 
   @DeleteMapping("/{userId}")
-  @PreAuthorize("hasRole({'ADMIN', 'DEPARTMENT_HEAD'})")
+  @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   public UserDetailsDto fireEmployee(Principal principal, @PathVariable String userId) {
     return userMapper.toUserDetailsDto(service.fire(principal, userId));
   }
