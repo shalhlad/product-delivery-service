@@ -19,6 +19,7 @@ import com.shalhlad.product_delivery_service.repository.ProductRepository;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.service.OrderService;
 import java.security.Principal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.transaction.Transactional;
@@ -79,6 +80,7 @@ public class OrderServiceImpl implements OrderService {
             .deliveryAddress(orderCreationDto.getDeliveryAddress())
             .orderedProducts(orderedProducts)
             .stage(Stage.NEW)
+            .stageHistory(Map.of(Stage.NEW, new Date()))
             .build()
     );
   }
@@ -149,6 +151,7 @@ public class OrderServiceImpl implements OrderService {
           "Only customer, collector or courier can change stage of order");
     }
     order.setStage(newStage);
+    order.getStageHistory().put(newStage, new Date());
     return orderRepository.save(order);
   }
 

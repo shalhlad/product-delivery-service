@@ -3,6 +3,7 @@ package com.shalhlad.product_delivery_service.entity.order;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import com.shalhlad.product_delivery_service.entity.user.User;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -16,6 +17,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.MapKeyEnumerated;
 import javax.persistence.MapKeyJoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -59,6 +62,16 @@ public class Order {
 
   @Enumerated(EnumType.STRING)
   private Stage stage;
+
+  @ElementCollection
+  @JoinTable(
+      name = "order_stage_history",
+      joinColumns = @JoinColumn(name = "order_id", referencedColumnName = "id")
+  )
+  @MapKeyEnumerated(EnumType.STRING)
+  @MapKeyColumn(name = "stage")
+  @Column(name = "date", nullable = false)
+  private Map<Stage, Date> stageHistory;
 
   @Override
   public boolean equals(Object o) {
