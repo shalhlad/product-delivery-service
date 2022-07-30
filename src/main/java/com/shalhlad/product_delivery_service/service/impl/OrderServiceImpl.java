@@ -78,9 +78,15 @@ public class OrderServiceImpl implements OrderService {
     });
     departmentRepository.save(department);
 
-    return orderRepository.save(Order.builder().user(user).department(department)
-        .deliveryAddress(orderCreationDto.getDeliveryAddress()).orderedProducts(orderedProducts)
-        .stage(Stage.NEW).stageHistory(Map.of(Stage.NEW, new Date())).build());
+    return orderRepository.save(
+        Order.builder()
+            .user(user)
+            .department(department)
+            .deliveryAddress(orderCreationDto.getDeliveryAddress())
+            .orderedProducts(orderedProducts)
+            .stage(Stage.NEW)
+            .stageHistory(Map.of(Stage.NEW, new Date())).build()
+    );
   }
 
   @Override
