@@ -15,12 +15,10 @@ import javax.persistence.MapKeyJoinColumn;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 @Entity(name = "departments")
 public class Department {

@@ -8,12 +8,10 @@ import javax.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 @Entity(name = "employees")
 public class Employee extends User {

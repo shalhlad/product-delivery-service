@@ -9,12 +9,10 @@ import javax.persistence.Id;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 @Entity(name = "categories")
 public class Category {
