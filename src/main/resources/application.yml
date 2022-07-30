@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/product_delivery_service
+    driver-class-name: org.postgresql.Driver
+    username: pds_user
+    password: pdpass
+
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    open-in-view: true
+
+server:
+  servlet:
+    context-path: /api
