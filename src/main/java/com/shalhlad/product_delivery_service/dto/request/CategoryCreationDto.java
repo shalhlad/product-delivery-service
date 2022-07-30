@@ -8,6 +8,6 @@ import org.hibernate.validator.constraints.Length;
 public class CategoryCreationDto {
 
   @NotNull(message = "Name should not be null")
-  @Length(min = 2, max = 25, message = "Name should be between 2 and 25 characters")
+  @Length(min = 2, max = 50, message = "Name should be between 2 and 50 characters")
   private String name;
 }
