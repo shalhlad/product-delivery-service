@@ -25,7 +25,8 @@ hs_err_pid*
 HELP.md
 mvnw
 mvnw.cmd
-/target/
-/.idea/
-/.mvn/
-/.jpb/
+target
+.idea
+.mvn
+.jpb
+demo.iml

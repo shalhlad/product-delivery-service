@@ -1,9 +1,11 @@
 package com.shalhlad.product_delivery_service.controller;
 
 import com.shalhlad.product_delivery_service.dto.request.UserRecruitRequestDto;
-import com.shalhlad.product_delivery_service.entity.user.Employee;
+import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsDto;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsDto;
 import com.shalhlad.product_delivery_service.entity.user.Role;
-import com.shalhlad.product_delivery_service.entity.user.User;
+import com.shalhlad.product_delivery_service.mapper.EmployeeMapper;
+import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.service.EmployeeService;
 import com.shalhlad.product_delivery_service.util.Utils;
 import java.security.Principal;
@@ -28,50 +30,55 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmployeeController {
 
   private final EmployeeService service;
+  private final EmployeeMapper employeeMapper;
+  private final UserMapper userMapper;
 
   @Autowired
-  public EmployeeController(EmployeeService service) {
+  public EmployeeController(EmployeeService service, EmployeeMapper employeeMapper,
+      UserMapper userMapper) {
     this.service = service;
+    this.employeeMapper = employeeMapper;
+    this.userMapper = userMapper;
   }
 
   @GetMapping
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
-  public Iterable<Employee> getEmployeesOfCurrentDepartment(Principal principal) {
-    return service.getEmployeesOfDepartment(principal);
+  public Iterable<EmployeeDetailsDto> getEmployeesOfCurrentDepartment(Principal principal) {
+    return employeeMapper.toDetailsDto(service.getEmployeesOfDepartment(principal));
   }
 
   @GetMapping("/{userId}")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
-  public Employee getEmployeeOfCurrentDepartmentByUserId(
+  public EmployeeDetailsDto getEmployeeOfCurrentDepartmentByUserId(
       Principal principal,
       @PathVariable String userId) {
-    return service.getEmployeeOfDepartmentByUserId(principal, userId);
+    return employeeMapper.toDetailsDto(service.getEmployeeOfDepartmentByUserId(principal, userId));
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasRole({'ADMIN', 'DEPARTMENT_HEAD'})")
-  public Employee recruitUser(
+  public EmployeeDetailsDto recruitUser(
       Principal principal,
       @RequestBody @Valid UserRecruitRequestDto userRecruitRequestDto,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return service.recruit(principal, userRecruitRequestDto);
+    return employeeMapper.toDetailsDto(service.recruit(principal, userRecruitRequestDto));
   }
 
   @PatchMapping("/{userId}")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
-  public Employee changeEmployeePosition(
+  public EmployeeDetailsDto changeEmployeePosition(
       Principal principal,
       @PathVariable String userId,
       @RequestParam Role position) {
-    return service.changePosition(principal, userId, position);
+    return employeeMapper.toDetailsDto(service.changePosition(principal, userId, position));
   }
 
   @DeleteMapping("/{userId}")
   @PreAuthorize("hasRole({'ADMIN', 'DEPARTMENT_HEAD'})")
-  public User fireEmployee(Principal principal, @PathVariable String userId) {
-    return service.fire(principal, userId);
+  public UserDetailsDto fireEmployee(Principal principal, @PathVariable String userId) {
+    return userMapper.toUserDetailsDto(service.fire(principal, userId));
   }
 
 

@@ -15,7 +15,7 @@ import org.hibernate.Hibernate;
 @Setter
 @ToString
 @RequiredArgsConstructor
-@Entity
+@Entity(name = "employees")
 public class Employee extends User {
 
   @ManyToOne

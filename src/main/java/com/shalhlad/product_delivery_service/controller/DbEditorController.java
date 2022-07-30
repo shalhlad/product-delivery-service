@@ -1,6 +1,7 @@
 package com.shalhlad.product_delivery_service.controller;
 
-import com.shalhlad.product_delivery_service.entity.user.User;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsDto;
+import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.service.DbEditorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,29 +19,31 @@ import org.springframework.web.bind.annotation.RestController;
 public class DbEditorController {
 
   private final DbEditorService dbEditorService;
+  private final UserMapper mapper;
 
   @Autowired
-  public DbEditorController(DbEditorService dbEditorService) {
+  public DbEditorController(DbEditorService dbEditorService, UserMapper mapper) {
     this.dbEditorService = dbEditorService;
+    this.mapper = mapper;
   }
 
   @GetMapping
-  public Iterable<User> getAll() {
-    return dbEditorService.findAll();
+  public Iterable<UserDetailsDto> getAll() {
+    return mapper.toUserDetailsDto(dbEditorService.findAll());
   }
 
   @GetMapping("/{userId}")
-  public User getByUserId(@PathVariable String userId) {
-    return dbEditorService.findByUserId(userId);
+  public UserDetailsDto getByUserId(@PathVariable String userId) {
+    return mapper.toUserDetailsDto(dbEditorService.findByUserId(userId));
   }
 
   @PostMapping
-  public User add(@RequestParam String userId) {
-    return dbEditorService.add(userId);
+  public UserDetailsDto add(@RequestParam String userId) {
+    return mapper.toUserDetailsDto(dbEditorService.add(userId));
   }
 
   @DeleteMapping("/{userId}")
-  public User remove(@PathVariable String userId) {
-    return dbEditorService.remove(userId);
+  public UserDetailsDto remove(@PathVariable String userId) {
+    return mapper.toUserDetailsDto(dbEditorService.remove(userId));
   }
 }
