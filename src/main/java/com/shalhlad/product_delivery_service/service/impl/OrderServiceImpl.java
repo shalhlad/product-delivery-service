@@ -61,9 +61,14 @@ public class OrderServiceImpl implements OrderService {
 
     Map<Product, OrderedProductDetails> orderedProducts = new HashMap<>();
     orderCreationDto.getOrderedProducts().forEach((productId, quantity) -> {
+      if (quantity == 0) {
+        return;
+      }
+
       Product product = productRepository.findById(productId)
           .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
-      if (productWarehouse.containsKey(product) && productWarehouse.get(product) >= quantity) {
+      if (productWarehouse.containsKey(product)
+          && productWarehouse.getOrDefault(product, 0) >= quantity) {
         productWarehouse.put(product, productWarehouse.get(product) - quantity);
         orderedProducts.put(product, OrderedProductDetails.of(product.getPrice(), quantity));
       } else {
@@ -73,16 +78,9 @@ public class OrderServiceImpl implements OrderService {
     });
     departmentRepository.save(department);
 
-    return orderRepository.save(
-        Order.builder()
-            .user(user)
-            .department(department)
-            .deliveryAddress(orderCreationDto.getDeliveryAddress())
-            .orderedProducts(orderedProducts)
-            .stage(Stage.NEW)
-            .stageHistory(Map.of(Stage.NEW, new Date()))
-            .build()
-    );
+    return orderRepository.save(Order.builder().user(user).department(department)
+        .deliveryAddress(orderCreationDto.getDeliveryAddress()).orderedProducts(orderedProducts)
+        .stage(Stage.NEW).stageHistory(Map.of(Stage.NEW, new Date())).build());
   }
 
   @Override
@@ -122,26 +120,21 @@ public class OrderServiceImpl implements OrderService {
           throw new NoRightsException("Employee can only process order of his department");
         }
         if (user.getRole() == Role.ROLE_COLLECTOR) {
-          if (newStage != Stage.APPROVED &&
-              newStage != Stage.COLLECTING &&
-              newStage != Stage.COLLECTED) {
+          if (newStage != Stage.APPROVED && newStage != Stage.COLLECTING
+              && newStage != Stage.COLLECTED) {
             throw new NoRightsException(
                 "Collector can only approve, start collecting and finish collecting order");
           }
-          if (order.getStage() != Stage.NEW &&
-              order.getStage() != Stage.APPROVED &&
-              order.getStage() != Stage.COLLECTING) {
+          if (order.getStage() != Stage.NEW && order.getStage() != Stage.APPROVED
+              && order.getStage() != Stage.COLLECTING) {
             throw new NoRightsException(
                 "Collector can only change stage of NEW, APPROVED or COLLECTING order");
           }
         } else {
-          if (newStage != Stage.IN_DELIVERY &&
-              newStage != Stage.GIVEN) {
-            throw new NoRightsException(
-                "Courier can only start delivering or give order");
+          if (newStage != Stage.IN_DELIVERY && newStage != Stage.GIVEN) {
+            throw new NoRightsException("Courier can only start delivering or give order");
           }
-          if (order.getStage() != Stage.COLLECTED &&
-              order.getStage() != Stage.IN_DELIVERY) {
+          if (order.getStage() != Stage.COLLECTED && order.getStage() != Stage.IN_DELIVERY) {
             throw new NoRightsException(
                 "Courier can only change stage of COLLECTED, IN_DELIVERY order");
           }
@@ -152,6 +145,14 @@ public class OrderServiceImpl implements OrderService {
     }
     order.setStage(newStage);
     order.getStageHistory().put(newStage, new Date());
+
+    if (newStage == Stage.CANCELED) {
+      Department department = order.getDepartment();
+      Map<Product, Integer> warehouse = department.getProductWarehouse();
+      order.getOrderedProducts()
+          .forEach((p, od) -> warehouse.put(p, warehouse.get(p) + od.getQuantity()));
+      departmentRepository.save(department);
+    }
     return orderRepository.save(order);
   }
 
