@@ -3,7 +3,6 @@ package com.shalhlad.product_delivery_service.controller;
 import com.shalhlad.product_delivery_service.dto.request.DepartmentCreationDto;
 import com.shalhlad.product_delivery_service.dto.request.ProductQuantityToChangeDto;
 import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsDto;
-import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.mapper.DepartmentMapper;
 import com.shalhlad.product_delivery_service.service.DepartmentService;
 import com.shalhlad.product_delivery_service.util.Utils;
@@ -60,11 +59,11 @@ public class DepartmentController {
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('WAREHOUSEMAN')")
-  public Department changeProductQuantity(
+  public DepartmentDetailsDto changeProductQuantity(
       @PathVariable Long id,
       @RequestBody @Valid ProductQuantityToChangeDto productQuantityToChangeDto,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return service.changeProductQuantity(id, productQuantityToChangeDto);
+    return mapper.toDetailsDto(service.changeProductQuantity(id, productQuantityToChangeDto));
   }
 }
