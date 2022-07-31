@@ -46,7 +46,7 @@ public class OrderController {
       @RequestParam String userId,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "25") int size) {
-    return mapper.toDetailsDto(service.getByUserId(userId, PageRequest.of(page, size)));
+    return mapper.toDetailsDto(service.findAllByUserId(userId, PageRequest.of(page, size)));
   }
 
   @PostMapping
@@ -65,5 +65,14 @@ public class OrderController {
       @PathVariable Long id,
       @RequestParam Stage stage) {
     return mapper.toDetailsDto(service.changeStage(principal, id, stage));
+  }
+
+  @GetMapping("/departments/{departmentId}/orders")
+  @PreAuthorize("hasAnyRole({'COLLECTOR', 'COURIER'})")
+  public Iterable<OrderDetailsDto> getOrdersOfDepartmentByStage(
+      Principal principal,
+      @PathVariable Long departmentId,
+      @RequestParam Stage stage) {
+    return mapper.toDetailsDto(service.findAllByDepartmentAndStage(principal, departmentId, stage));
   }
 }

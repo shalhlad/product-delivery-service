@@ -12,7 +12,9 @@ public interface OrderService {
 
   Order getById(Long id);
 
-  Iterable<Order> getByUserId(String userId, Pageable pageable);
+  Iterable<Order> findAllByUserId(String userId, Pageable pageable);
 
   Order changeStage(Principal principal, Long orderId, Stage newStage);
+
+  Iterable<Order> findAllByDepartmentAndStage(Principal principal, Long departmentId, Stage stage);
 }

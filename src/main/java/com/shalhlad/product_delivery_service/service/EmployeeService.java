@@ -8,9 +8,9 @@ import java.security.Principal;
 
 public interface EmployeeService {
 
-  Iterable<Employee> getEmployeesOfDepartment(Principal principal);
+  Iterable<Employee> findAllEmployeesOfDepartment(Principal principal);
 
-  Employee getEmployeeOfDepartmentByUserId(Principal principal, String userId);
+  Employee findEmployeeOfDepartmentByUserId(Principal principal, String userId);
 
   Employee recruit(Principal principal, UserRecruitRequestDto userRecruitRequestDto);
 

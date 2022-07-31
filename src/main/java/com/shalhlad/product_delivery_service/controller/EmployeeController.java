@@ -44,7 +44,7 @@ public class EmployeeController {
   @GetMapping
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
   public Iterable<EmployeeDetailsDto> getEmployeesOfCurrentDepartment(Principal principal) {
-    return employeeMapper.toDetailsDto(service.getEmployeesOfDepartment(principal));
+    return employeeMapper.toDetailsDto(service.findAllEmployeesOfDepartment(principal));
   }
 
   @GetMapping("/{userId}")
@@ -52,7 +52,7 @@ public class EmployeeController {
   public EmployeeDetailsDto getEmployeeOfCurrentDepartmentByUserId(
       Principal principal,
       @PathVariable String userId) {
-    return employeeMapper.toDetailsDto(service.getEmployeeOfDepartmentByUserId(principal, userId));
+    return employeeMapper.toDetailsDto(service.findEmployeeOfDepartmentByUserId(principal, userId));
   }
 
   @PostMapping

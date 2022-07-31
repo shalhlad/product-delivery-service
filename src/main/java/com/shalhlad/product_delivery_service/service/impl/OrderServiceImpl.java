@@ -96,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Iterable<Order> getByUserId(String userId, Pageable pageable) {
+  public Iterable<Order> findAllByUserId(String userId, Pageable pageable) {
     User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new NotFoundException("User not found with userId: " + userId));
     return orderRepository.findAllByUser(user, pageable);
@@ -160,6 +160,19 @@ public class OrderServiceImpl implements OrderService {
       departmentRepository.save(department);
     }
     return orderRepository.save(order);
+  }
+
+  @Override
+  public Iterable<Order> findAllByDepartmentAndStage(Principal principal, Long departmentId,
+      Stage stage) {
+    Department department = departmentRepository.findById(departmentId)
+        .orElseThrow(() -> new NotFoundException("Department not found with id: " + departmentId));
+    Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
+    if (!employee.getDepartment().equals(department)) {
+      throw new NoRightsException(
+          "Cannot get orders of department because current user does not works in requested department");
+    }
+    return orderRepository.findAllByDepartmentAndStage(department, stage);
   }
 
 }

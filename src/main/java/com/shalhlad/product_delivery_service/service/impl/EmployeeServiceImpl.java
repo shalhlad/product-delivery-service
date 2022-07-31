@@ -40,13 +40,13 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   @Override
-  public Iterable<Employee> getEmployeesOfDepartment(Principal principal) {
+  public Iterable<Employee> findAllEmployeesOfDepartment(Principal principal) {
     Employee manager = employeeRepository.findByEmail(principal.getName()).orElseThrow();
     return employeeRepository.findAllByDepartment(manager.getDepartment());
   }
 
   @Override
-  public Employee getEmployeeOfDepartmentByUserId(Principal principal, String userId) {
+  public Employee findEmployeeOfDepartmentByUserId(Principal principal, String userId) {
     Employee manager = employeeRepository.findByEmail(principal.getName()).orElseThrow();
     return employeeRepository.findByDepartmentAndUserId(manager.getDepartment(), userId)
         .orElseThrow(() -> new NotFoundException(
