@@ -67,8 +67,7 @@ public class OrderServiceImpl implements OrderService {
 
       Product product = productRepository.findById(productId)
           .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
-      if (productWarehouse.containsKey(product)
-          && productWarehouse.getOrDefault(product, 0) >= quantity) {
+      if (productWarehouse.getOrDefault(product, 0) >= quantity) {
         productWarehouse.put(product, productWarehouse.get(product) - quantity);
         orderedProducts.put(product, OrderedProductDetails.of(product.getPrice(), quantity));
       } else {
@@ -85,7 +84,8 @@ public class OrderServiceImpl implements OrderService {
             .deliveryAddress(orderCreationDto.getDeliveryAddress())
             .orderedProducts(orderedProducts)
             .stage(Stage.NEW)
-            .stageHistory(Map.of(Stage.NEW, new Date())).build()
+            .stageHistory(Map.of(Stage.NEW, new Date()))
+            .build()
     );
   }
 
@@ -156,7 +156,7 @@ public class OrderServiceImpl implements OrderService {
       Department department = order.getDepartment();
       Map<Product, Integer> warehouse = department.getProductWarehouse();
       order.getOrderedProducts()
-          .forEach((p, od) -> warehouse.put(p, warehouse.get(p) + od.getQuantity()));
+          .forEach((p, od) -> warehouse.put(p, warehouse.getOrDefault(p, 0) + od.getQuantity()));
       departmentRepository.save(department);
     }
     return orderRepository.save(order);
