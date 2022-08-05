@@ -77,7 +77,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             .getDepartment()
             .equals(department)) {
           throw new NoRightsException(
-              "The head of the department is not the head of the department in which the employee neet to recruite");
+              "The head of the department is not the head of the department in which the employee need to recruit");
         }
       }
       default -> throw new NoRightsException("Only admin or department head can recruit employees");
