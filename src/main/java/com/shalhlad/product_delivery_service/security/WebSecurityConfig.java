@@ -4,8 +4,6 @@ import com.shalhlad.product_delivery_service.security.jwt.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,21 +32,15 @@ public class WebSecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(
-      AuthenticationConfiguration authenticationConfiguration) throws Exception {
-    return authenticationConfiguration.getAuthenticationManager();
-  }
-
-  @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
         .httpBasic().disable()
         .csrf().disable()
         .authorizeRequests(authz -> authz
-            .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL,
-                SecurityConstants.SIGN_IN_URL).permitAll()
-            .antMatchers(HttpMethod.GET, "/products/**",
-                "/departments/**", "/categories/**").permitAll()
+            .antMatchers(HttpMethod.POST,
+                SecurityConstants.SIGN_UP_URL, SecurityConstants.SIGN_IN_URL).permitAll()
+            .antMatchers(HttpMethod.GET,
+                "/products/**", "/departments/**", "/categories/**").permitAll()
             .anyRequest().authenticated()
         )
         .exceptionHandling(handling -> handling

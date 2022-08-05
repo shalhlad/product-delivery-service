@@ -18,15 +18,15 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
   @Override
   public void handle(HttpServletRequest request, HttpServletResponse response,
       AccessDeniedException accessDeniedException) throws IOException {
-    HttpStatus status = HttpStatus.FORBIDDEN;
+    HttpStatus httpStatus = HttpStatus.FORBIDDEN;
 
     ErrorResponse errorResponse = new ErrorResponse();
-    errorResponse.setStatus(status.getReasonPhrase());
-    errorResponse.setCode(status.value());
+    errorResponse.setStatus(httpStatus.getReasonPhrase());
+    errorResponse.setCode(httpStatus.value());
     errorResponse.setMessage("Access denied");
     errorResponse.setTimestamp(new Date());
 
-    response.setStatus(status.value());
+    response.setStatus(httpStatus.value());
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     new JsonMapper().writeValue(response.getOutputStream(), errorResponse);
   }

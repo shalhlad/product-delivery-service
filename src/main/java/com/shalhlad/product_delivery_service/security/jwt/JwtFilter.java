@@ -33,7 +33,7 @@ public class JwtFilter extends GenericFilterBean {
       throws IOException, ServletException {
     String token = getTokenFromRequest((HttpServletRequest) request);
     if (token != null) {
-      String email = jwtProvider.getLoginFromToken(token);
+      String email = jwtProvider.getEmailFromToken(token);
       UserDetails userDetails = userDetailsService.loadUserByUsername(email);
       UsernamePasswordAuthenticationToken auth =
           new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

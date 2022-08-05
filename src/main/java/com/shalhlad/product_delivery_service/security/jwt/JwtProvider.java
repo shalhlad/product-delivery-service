@@ -1,6 +1,5 @@
 package com.shalhlad.product_delivery_service.security.jwt;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.time.LocalDate;
@@ -32,12 +31,12 @@ public class JwtProvider {
         .compact();
   }
 
-  public String getLoginFromToken(String token) {
-    Claims claims = Jwts.parser()
+  public String getEmailFromToken(String token) {
+    return Jwts.parser()
         .setSigningKey(jwtSecret)
         .parseClaimsJws(token)
-        .getBody();
-    return claims.getSubject();
+        .getBody()
+        .getSubject();
   }
 
 }
