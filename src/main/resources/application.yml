@@ -14,3 +14,7 @@ spring:
 server:
   servlet:
     context-path: /api
+
+jwt:
+  secret: Minsk
+  expiration-days: 10

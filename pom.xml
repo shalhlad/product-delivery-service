@@ -3,11 +3,10 @@
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>demo</artifactId>
+  <artifactId>product_delivery_service</artifactId>
   <description>Product delivery service</description>
   <groupId>com.shalhlad</groupId>
   <version>0.0.1-SNAPSHOT</version>
-
   <name>product-delivery-service</name>
 
   <parent>
@@ -19,9 +18,8 @@
 
   <properties>
     <io.jsonwebtoken.version>0.9.1</io.jsonwebtoken.version>
-    <io.springfox.version>3.0.0</io.springfox.version>
     <java.version>17</java.version>
-    <org.mapstruct.version>1.5.1.Final</org.mapstruct.version>
+    <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
     <org.projectlombok.version>1.18.24</org.projectlombok.version>
   </properties>
 
@@ -60,8 +58,8 @@
       </plugin>
 
     </plugins>
-
   </build>
+
   <dependencies>
 
     <dependency>
@@ -125,11 +123,6 @@
       <artifactId>jjwt</artifactId>
       <groupId>io.jsonwebtoken</groupId>
       <version>${io.jsonwebtoken.version}</version>
-    </dependency>
-
-    <dependency>
-      <artifactId>jackson-dataformat-xml</artifactId>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
     </dependency>
 
   </dependencies>

@@ -1,23 +1,18 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
-import com.shalhlad.product_delivery_service.dto.request.SignUpDetailsDto;
 import com.shalhlad.product_delivery_service.dto.request.UserDetailsUpdateDto;
-import com.shalhlad.product_delivery_service.entity.user.Role;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import com.shalhlad.product_delivery_service.exception.NoRightsException;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
 import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.service.UserService;
-import com.shalhlad.product_delivery_service.util.Utils;
 import java.security.Principal;
 import java.util.Collections;
-import java.util.Date;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,39 +20,12 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
 
   @Autowired
-  public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-      UserMapper userMapper) {
+  public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
     this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
     this.userMapper = userMapper;
-  }
-
-  @Override
-  public User signUp(SignUpDetailsDto signUpDetailsDto) {
-    final int USER_ID_LENGTH = 15;
-    if (userRepository.existsByEmail(signUpDetailsDto.getEmail())) {
-      throw new RuntimeException(
-          "User already exists with email: " + signUpDetailsDto.getEmail());
-    }
-
-    User user = new User();
-    user.setEmail(signUpDetailsDto.getEmail());
-    user.setEncryptedPassword(passwordEncoder.encode(signUpDetailsDto.getPassword()));
-    user.setRegistrationDate(new Date());
-    user.setFirstName(signUpDetailsDto.getFirstName());
-    user.setRole(Role.ROLE_CUSTOMER);
-
-    String userId;
-    do {
-      userId = Utils.generateUserId(USER_ID_LENGTH);
-    } while (userRepository.existsByUserId(userId));
-    user.setUserId(userId);
-
-    return userRepository.save(user);
   }
 
   @Override
