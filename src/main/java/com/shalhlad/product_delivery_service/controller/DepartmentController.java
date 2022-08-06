@@ -6,9 +6,9 @@ import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithW
 import com.shalhlad.product_delivery_service.mapper.DepartmentMapper;
 import com.shalhlad.product_delivery_service.service.DepartmentService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import java.security.Principal;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,11 +39,15 @@ public class DepartmentController {
     return mapper.toDetailsWithWarehouseDto(service.findById(id));
   }
 
+  @GetMapping("/me")
+  @PreAuthorize("hasAnyRole({'COLLECTOR', 'COURIER', 'DEPARTMENT_HEAD'})")
+  public DepartmentDetailsWithWarehouseDto getByAuthorization(Principal principal) {
+    return mapper.toDetailsWithWarehouseDto(service.findByPrincipal(principal));
+  }
+
   @GetMapping
-  public Iterable<DepartmentDetailsWithWarehouseDto> getAll(
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "25") int size) {
-    return mapper.toDetailsWithWarehouseDto(service.findAll(PageRequest.of(page, size)));
+  public Iterable<DepartmentDetailsWithWarehouseDto> getAll() {
+    return mapper.toDetailsWithWarehouseDto(service.findAll());
   }
 
   @PostMapping

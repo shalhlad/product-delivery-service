@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +50,8 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Order create(String email, OrderCreationDto orderCreationDto) {
+  public Order create(Principal principal, OrderCreationDto orderCreationDto) {
+    String email = principal.getName();
     Department department = departmentRepository.findById(orderCreationDto.getDepartmentId())
         .orElseThrow(() -> new NotFoundException(
             "Department not found with id: " + orderCreationDto.getDepartmentId()));
@@ -96,9 +98,16 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Iterable<Order> findAllByUserId(String userId, Pageable pageable) {
+  public Page<Order> findAllByUserId(String userId, Pageable pageable) {
     User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new NotFoundException("User not found with userId: " + userId));
+    return orderRepository.findAllByUser(user, pageable);
+  }
+
+  @Override
+  public Page<Order> findAllByEmail(String email, Pageable pageable) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
     return orderRepository.findAllByUser(user, pageable);
   }
 
@@ -163,8 +172,8 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Iterable<Order> findAllByDepartmentAndStage(Principal principal, Long departmentId,
-      Stage stage) {
+  public Page<Order> findAllByDepartmentAndStage(Principal principal, Long departmentId,
+      Stage stage, Pageable pageable) {
     Department department = departmentRepository.findById(departmentId)
         .orElseThrow(() -> new NotFoundException("Department not found with id: " + departmentId));
     Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
@@ -172,7 +181,8 @@ public class OrderServiceImpl implements OrderService {
       throw new NoRightsException(
           "Cannot get orders of department because current user does not works in requested department");
     }
-    return orderRepository.findAllByDepartmentAndStage(department, stage);
+    return orderRepository.findAllByDepartmentAndStage(department, stage, pageable);
   }
+
 
 }

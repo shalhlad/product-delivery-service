@@ -1,15 +1,15 @@
 package com.shalhlad.product_delivery_service.service;
 
-import com.shalhlad.product_delivery_service.dto.request.UserDetailsUpdateDto;
 import com.shalhlad.product_delivery_service.entity.user.User;
-import java.security.Principal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService extends UserDetailsService {
 
-  Iterable<User> findAll();
+  Page<User> findAll(Pageable pageable);
 
   User findByUserId(String userId);
 
-  User update(Principal principal, String userId, UserDetailsUpdateDto userDetailsUpdateDto);
+  User findByEmail(String email);
 }

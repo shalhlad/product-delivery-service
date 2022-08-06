@@ -8,7 +8,7 @@ import java.security.Principal;
 
 public interface EmployeeService {
 
-  Iterable<Employee> findAllEmployeesOfDepartment(Principal principal);
+  Iterable<Employee> findAllEmployeesOfAuthorizationDepartment(Principal principal);
 
   Employee findEmployeeOfDepartmentByUserId(Principal principal, String userId);
 
@@ -18,4 +18,5 @@ public interface EmployeeService {
 
   Employee changePosition(Principal principal, String userId, Role role);
 
+  Iterable<Employee> findAllEmployeesByDepartmentId(Principal principal, Long departmentId);
 }

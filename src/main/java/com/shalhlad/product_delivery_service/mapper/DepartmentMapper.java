@@ -17,13 +17,10 @@ public interface DepartmentMapper {
   @Mapping(target = "productWarehouse", qualifiedByName = "productQuantityMapToList")
   DepartmentDetailsWithWarehouseDto toDetailsWithWarehouseDto(Department department);
 
-  Iterable<DepartmentDetailsWithWarehouseDto> toDetailsWithWarehouseDto(
+  List<DepartmentDetailsWithWarehouseDto> toDetailsWithWarehouseDto(
       Iterable<Department> departments);
 
-  DepartmentDetailsDto toDepartmentDetailsDto(Department department);
-
-  Iterable<DepartmentDetailsDto> toDetailsDto(Iterable<Department> departments);
-
+  DepartmentDetailsDto toDetailsDto(Department department);
 
   @Named("productQuantityMapToList")
   default List<ProductWithQuantityDto> productQuantityMapToList(

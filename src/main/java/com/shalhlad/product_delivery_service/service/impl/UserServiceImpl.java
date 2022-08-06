@@ -1,16 +1,14 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
-import com.shalhlad.product_delivery_service.dto.request.UserDetailsUpdateDto;
 import com.shalhlad.product_delivery_service.entity.user.User;
-import com.shalhlad.product_delivery_service.exception.NoRightsException;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
-import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.service.UserService;
-import java.security.Principal;
 import java.util.Collections;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,17 +18,15 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
-  private final UserMapper userMapper;
 
   @Autowired
-  public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+  public UserServiceImpl(UserRepository userRepository) {
     this.userRepository = userRepository;
-    this.userMapper = userMapper;
   }
 
   @Override
-  public Iterable<User> findAll() {
-    return userRepository.findAll();
+  public Page<User> findAll(Pageable pageable) {
+    return userRepository.findAll(pageable);
   }
 
   @Override
@@ -40,18 +36,9 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User update(Principal principal, String userId,
-      UserDetailsUpdateDto userDetailsUpdateDto) {
-    String email = principal.getName();
-    User principalUser = userRepository.findByEmail(email).orElseThrow();
-
-    User targetUser = findByUserId(userId);
-    if (!targetUser.equals(principalUser)) {
-      throw new NoRightsException("Given userId does not belong to authorized user");
-    }
-
-    userMapper.update(principalUser, userDetailsUpdateDto);
-    return userRepository.save(principalUser);
+  public User findByEmail(String email) {
+    return userRepository.findByEmail(email).orElseThrow(() ->
+        new NotFoundException("User not found with email: " + email));
   }
 
   @Override

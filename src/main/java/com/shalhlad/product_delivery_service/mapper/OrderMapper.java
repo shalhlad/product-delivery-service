@@ -12,6 +12,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 @Mapper(uses = {UserMapper.class, DepartmentMapper.class})
 public interface OrderMapper {
@@ -22,7 +24,12 @@ public interface OrderMapper {
   })
   OrderDetailsDto toDetailsDto(Order order);
 
-  Iterable<OrderDetailsDto> toDetailsDto(Iterable<Order> orders);
+  List<OrderDetailsDto> toDetailsDto(Iterable<Order> orders);
+
+  default Page<OrderDetailsDto> toDetailsDto(Page<Order> orders) {
+    List<OrderDetailsDto> mappedContent = toDetailsDto(orders.getContent());
+    return new PageImpl<>(mappedContent, orders.getPageable(), orders.getTotalElements());
+  }
 
   default BigDecimal calculateOrderPrice(Order order) {
     return order.getOrderedProducts().values().stream()

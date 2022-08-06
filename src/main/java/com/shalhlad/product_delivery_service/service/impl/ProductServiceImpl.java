@@ -32,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public Iterable<Product> findAll(Long categoryId, Pageable pageable) {
+  public Page<Product> findAll(Long categoryId, Pageable pageable) {
     Page<Product> products;
     if (categoryId == null) {
       products = productRepository.findAll(pageable);

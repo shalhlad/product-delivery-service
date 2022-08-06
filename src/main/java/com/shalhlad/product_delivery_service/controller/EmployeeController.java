@@ -20,13 +20,11 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/employees")
 public class EmployeeController {
 
   private final EmployeeService service;
@@ -41,13 +39,23 @@ public class EmployeeController {
     this.userMapper = userMapper;
   }
 
-  @GetMapping
+  @GetMapping("/departments/me/employees")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
   public Iterable<EmployeeDetailsDto> getEmployeesOfCurrentDepartment(Principal principal) {
-    return employeeMapper.toDetailsDto(service.findAllEmployeesOfDepartment(principal));
+    return employeeMapper.toDetailsDto(
+        service.findAllEmployeesOfAuthorizationDepartment(principal));
   }
 
-  @GetMapping("/{userId}")
+  @GetMapping("/departments/{departmentId}/employees")
+  @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
+  public Iterable<EmployeeDetailsDto> getEmployeesOfCurrentDepartment(
+      Principal principal,
+      @PathVariable Long departmentId) {
+    return employeeMapper.toDetailsDto(
+        service.findAllEmployeesByDepartmentId(principal, departmentId));
+  }
+
+  @GetMapping("/employees//{userId}")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
   public EmployeeDetailsDto getEmployeeOfCurrentDepartmentByUserId(
       Principal principal,
@@ -55,7 +63,7 @@ public class EmployeeController {
     return employeeMapper.toDetailsDto(service.findEmployeeOfDepartmentByUserId(principal, userId));
   }
 
-  @PostMapping
+  @PostMapping("/employees")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   public EmployeeDetailsDto recruitUser(
@@ -66,7 +74,7 @@ public class EmployeeController {
     return employeeMapper.toDetailsDto(service.recruit(principal, userRecruitRequestDto));
   }
 
-  @PatchMapping("/{userId}")
+  @PatchMapping("/employees/{userId}")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
   public EmployeeDetailsDto changeEmployeePosition(
       Principal principal,
@@ -75,7 +83,7 @@ public class EmployeeController {
     return employeeMapper.toDetailsDto(service.changePosition(principal, userId, position));
   }
 
-  @DeleteMapping("/{userId}")
+  @DeleteMapping("/employees/{userId}")
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   public UserDetailsDto fireEmployee(Principal principal, @PathVariable String userId) {
     return userMapper.toDetailsDto(service.fire(principal, userId));

@@ -4,15 +4,17 @@ import com.shalhlad.product_delivery_service.dto.request.DepartmentCreationDto;
 import com.shalhlad.product_delivery_service.dto.request.ProductQuantityToChangeDto;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.product.Product;
+import com.shalhlad.product_delivery_service.entity.user.Employee;
 import com.shalhlad.product_delivery_service.exception.InvalidValueException;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
 import com.shalhlad.product_delivery_service.repository.DepartmentRepository;
+import com.shalhlad.product_delivery_service.repository.EmployeeRepository;
 import com.shalhlad.product_delivery_service.repository.ProductRepository;
 import com.shalhlad.product_delivery_service.service.DepartmentService;
+import java.security.Principal;
 import java.util.Map;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,12 +23,14 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   private final DepartmentRepository departmentRepository;
   private final ProductRepository productRepository;
+  private final EmployeeRepository employeeRepository;
 
   @Autowired
   public DepartmentServiceImpl(DepartmentRepository departmentRepository,
-      ProductRepository productRepository) {
+      ProductRepository productRepository, EmployeeRepository employeeRepository) {
     this.departmentRepository = departmentRepository;
     this.productRepository = productRepository;
+    this.employeeRepository = employeeRepository;
   }
 
   @Override
@@ -43,8 +47,8 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Override
-  public Iterable<Department> findAll(Pageable pageable) {
-    return departmentRepository.findAll(pageable);
+  public Iterable<Department> findAll() {
+    return departmentRepository.findAll();
   }
 
   @Override
@@ -74,5 +78,11 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     return departmentRepository.save(department);
+  }
+
+  @Override
+  public Department findByPrincipal(Principal principal) {
+    Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
+    return employee.getDepartment();
   }
 }

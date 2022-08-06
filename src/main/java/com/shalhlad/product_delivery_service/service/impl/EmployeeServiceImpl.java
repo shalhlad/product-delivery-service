@@ -40,9 +40,16 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   @Override
-  public Iterable<Employee> findAllEmployeesOfDepartment(Principal principal) {
+  public Iterable<Employee> findAllEmployeesOfAuthorizationDepartment(Principal principal) {
     Employee manager = employeeRepository.findByEmail(principal.getName()).orElseThrow();
     return employeeRepository.findAllByDepartment(manager.getDepartment());
+  }
+
+  @Override
+  public Iterable<Employee> findAllEmployeesByDepartmentId(Principal principal, Long departmentId) {
+    Department department = departmentRepository.findById(departmentId)
+        .orElseThrow(() -> new NotFoundException("Department not found with id " + departmentId));
+    return employeeRepository.findAllByDepartment(department);
   }
 
   @Override
@@ -142,4 +149,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     target.setRole(role);
     return employeeRepository.save(target);
   }
+
+
 }
