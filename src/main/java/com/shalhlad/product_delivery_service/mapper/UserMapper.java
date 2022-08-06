@@ -14,9 +14,9 @@ import org.mapstruct.Mappings;
 @Mapper
 public interface UserMapper {
 
-  UserDetailsDto toUserDetailsDto(User user);
+  UserDetailsDto toDetailsDto(User user);
 
-  Iterable<UserDetailsDto> toUserDetailsDto(Iterable<User> user);
+  Iterable<UserDetailsDto> toDetailsDto(Iterable<User> users);
 
   @Mapping(target = "department", ignore = true)
   Employee toEmployee(User user);

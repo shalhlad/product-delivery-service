@@ -43,14 +43,15 @@ public class UserServiceImpl implements UserService {
   public User update(Principal principal, String userId,
       UserDetailsUpdateDto userDetailsUpdateDto) {
     String email = principal.getName();
-    User user = userRepository.findByEmail(email).orElseThrow();
+    User principalUser = userRepository.findByEmail(email).orElseThrow();
 
-    if (!user.getUserId().equals(userId)) {
-      throw new NoRightsException("The current user cannot change information about another user");
+    User targetUser = findByUserId(userId);
+    if (!targetUser.equals(principalUser)) {
+      throw new NoRightsException("Given userId does not belong to authorized user");
     }
 
-    userMapper.update(user, userDetailsUpdateDto);
-    return userRepository.save(user);
+    userMapper.update(principalUser, userDetailsUpdateDto);
+    return userRepository.save(principalUser);
   }
 
   @Override

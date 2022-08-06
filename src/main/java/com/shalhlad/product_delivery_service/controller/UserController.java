@@ -1,18 +1,12 @@
 package com.shalhlad.product_delivery_service.controller;
 
-import com.shalhlad.product_delivery_service.dto.request.UserDetailsUpdateDto;
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsDto;
 import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.service.UserService;
-import com.shalhlad.product_delivery_service.util.Utils;
-import java.security.Principal;
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,23 +23,16 @@ public class UserController {
     this.mapper = mapper;
   }
 
-  @PatchMapping("/{userId}")
-  public UserDetailsDto updateDetails(
-      Principal principal,
-      @PathVariable String userId,
-      @RequestBody @Valid UserDetailsUpdateDto userDetailsUpdateDto,
-      BindingResult bindingResult) {
-    Utils.throwExceptionIfFailedValidation(bindingResult);
-    return mapper.toUserDetailsDto(service.update(principal, userId, userDetailsUpdateDto));
-  }
-
   @GetMapping
+  @PreAuthorize("hasRole('ADMIN')")
   public Iterable<UserDetailsDto> getUsers() {
-    return mapper.toUserDetailsDto(service.findAll());
+    return mapper.toDetailsDto(service.findAll());
   }
 
   @GetMapping("/{userId}")
+  @PreAuthorize("isAuthenticated()")
   public UserDetailsDto getByUserId(@PathVariable String userId) {
-    return mapper.toUserDetailsDto(service.findByUserId(userId));
+    return mapper.toDetailsDto(service.findByUserId(userId));
   }
+
 }

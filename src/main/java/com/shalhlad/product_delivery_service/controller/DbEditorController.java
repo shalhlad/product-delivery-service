@@ -29,21 +29,21 @@ public class DbEditorController {
 
   @GetMapping
   public Iterable<UserDetailsDto> getAll() {
-    return mapper.toUserDetailsDto(dbEditorService.findAll());
+    return mapper.toDetailsDto(dbEditorService.findAll());
   }
 
   @GetMapping("/{userId}")
   public UserDetailsDto getByUserId(@PathVariable String userId) {
-    return mapper.toUserDetailsDto(dbEditorService.findByUserId(userId));
+    return mapper.toDetailsDto(dbEditorService.findByUserId(userId));
   }
 
   @PostMapping
   public UserDetailsDto add(@RequestParam String userId) {
-    return mapper.toUserDetailsDto(dbEditorService.add(userId));
+    return mapper.toDetailsDto(dbEditorService.add(userId));
   }
 
   @DeleteMapping("/{userId}")
   public UserDetailsDto remove(@PathVariable String userId) {
-    return mapper.toUserDetailsDto(dbEditorService.remove(userId));
+    return mapper.toDetailsDto(dbEditorService.remove(userId));
   }
 }

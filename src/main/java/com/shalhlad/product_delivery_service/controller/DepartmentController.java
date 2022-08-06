@@ -2,7 +2,7 @@ package com.shalhlad.product_delivery_service.controller;
 
 import com.shalhlad.product_delivery_service.dto.request.DepartmentCreationDto;
 import com.shalhlad.product_delivery_service.dto.request.ProductQuantityToChangeDto;
-import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsDto;
+import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithWarehouseDto;
 import com.shalhlad.product_delivery_service.mapper.DepartmentMapper;
 import com.shalhlad.product_delivery_service.service.DepartmentService;
 import com.shalhlad.product_delivery_service.util.Utils;
@@ -36,34 +36,35 @@ public class DepartmentController {
   }
 
   @GetMapping("/{id}")
-  public DepartmentDetailsDto getById(@PathVariable Long id) {
-    return mapper.toDetailsDto(service.findById(id));
+  public DepartmentDetailsWithWarehouseDto getById(@PathVariable Long id) {
+    return mapper.toDetailsWithWarehouseDto(service.findById(id));
   }
 
   @GetMapping
-  public Iterable<DepartmentDetailsDto> getAll(
+  public Iterable<DepartmentDetailsWithWarehouseDto> getAll(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "25") int size) {
-    return mapper.toDetailsDto(service.findAll(PageRequest.of(page, size)));
+    return mapper.toDetailsWithWarehouseDto(service.findAll(PageRequest.of(page, size)));
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasRole('DB_EDITOR')")
-  public DepartmentDetailsDto create(
+  public DepartmentDetailsWithWarehouseDto create(
       @RequestBody @Valid DepartmentCreationDto departmentCreationDto,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return mapper.toDetailsDto(service.create(departmentCreationDto));
+    return mapper.toDetailsWithWarehouseDto(service.create(departmentCreationDto));
   }
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('WAREHOUSEMAN')")
-  public DepartmentDetailsDto changeProductQuantity(
+  public DepartmentDetailsWithWarehouseDto changeProductQuantity(
       @PathVariable Long id,
       @RequestBody @Valid ProductQuantityToChangeDto productQuantityToChangeDto,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return mapper.toDetailsDto(service.changeProductQuantity(id, productQuantityToChangeDto));
+    return mapper.toDetailsWithWarehouseDto(
+        service.changeProductQuantity(id, productQuantityToChangeDto));
   }
 }

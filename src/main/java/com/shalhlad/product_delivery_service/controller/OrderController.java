@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/orders")
+@PreAuthorize("isAuthenticated()")
 public class OrderController {
 
   private final OrderService service;

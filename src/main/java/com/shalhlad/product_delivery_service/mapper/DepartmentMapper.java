@@ -1,7 +1,7 @@
 package com.shalhlad.product_delivery_service.mapper;
 
 import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsDto;
-import com.shalhlad.product_delivery_service.dto.response.OrderDepartmentDetailsDto;
+import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithWarehouseDto;
 import com.shalhlad.product_delivery_service.dto.response.ProductWithQuantityDto;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.product.Product;
@@ -15,11 +15,15 @@ import org.mapstruct.Named;
 public interface DepartmentMapper {
 
   @Mapping(target = "productWarehouse", qualifiedByName = "productQuantityMapToList")
-  DepartmentDetailsDto toDetailsDto(Department department);
+  DepartmentDetailsWithWarehouseDto toDetailsWithWarehouseDto(Department department);
+
+  Iterable<DepartmentDetailsWithWarehouseDto> toDetailsWithWarehouseDto(
+      Iterable<Department> departments);
+
+  DepartmentDetailsDto toDepartmentDetailsDto(Department department);
 
   Iterable<DepartmentDetailsDto> toDetailsDto(Iterable<Department> departments);
 
-  OrderDepartmentDetailsDto toOrderDepartmentDetailsDto(Department department);
 
   @Named("productQuantityMapToList")
   default List<ProductWithQuantityDto> productQuantityMapToList(

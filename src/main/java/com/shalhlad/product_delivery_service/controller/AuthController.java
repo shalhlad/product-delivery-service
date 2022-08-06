@@ -34,7 +34,7 @@ public class AuthController {
       @RequestBody @Valid SignUpDetailsDto signUpDetailsDto,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return mapper.toUserDetailsDto(service.signUp(signUpDetailsDto));
+    return mapper.toDetailsDto(service.signUp(signUpDetailsDto));
   }
 
   @PostMapping("/sign-in")

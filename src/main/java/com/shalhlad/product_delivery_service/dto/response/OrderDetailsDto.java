@@ -11,7 +11,7 @@ import lombok.Data;
 public class OrderDetailsDto {
 
   private Long id;
-  private OrderDepartmentDetailsDto department;
+  private DepartmentDetailsDto department;
   private String deliveryAddress;
   private List<ProductWithQuantityDto> orderedProducts;
   private BigDecimal orderPrice;

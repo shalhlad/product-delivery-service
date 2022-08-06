@@ -26,11 +26,11 @@ public class AdminController {
 
   @GetMapping
   public Iterable<UserDetailsDto> getAll() {
-    return mapper.toUserDetailsDto(service.findAll());
+    return mapper.toDetailsDto(service.findAll());
   }
 
   @GetMapping("/{userId}")
   public UserDetailsDto getByUserId(@PathVariable String userId) {
-    return mapper.toUserDetailsDto(service.findByUserId(userId));
+    return mapper.toDetailsDto(service.findByUserId(userId));
   }
 }

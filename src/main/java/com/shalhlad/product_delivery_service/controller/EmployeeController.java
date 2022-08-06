@@ -78,7 +78,7 @@ public class EmployeeController {
   @DeleteMapping("/{userId}")
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   public UserDetailsDto fireEmployee(Principal principal, @PathVariable String userId) {
-    return userMapper.toUserDetailsDto(service.fire(principal, userId));
+    return userMapper.toDetailsDto(service.fire(principal, userId));
   }
 
 
