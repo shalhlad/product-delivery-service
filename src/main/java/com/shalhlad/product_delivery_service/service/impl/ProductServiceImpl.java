@@ -65,9 +65,13 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public Product update(Long id, ProductUpdateDto productUpdateDto) {
     Product product = findById(id);
-    Category category = categoryRepository.findById(productUpdateDto.getCategoryId())
-        .orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
-    product.setCategory(category);
+
+    if (productUpdateDto.getCategoryId() != null) {
+      Category category = categoryRepository.findById(productUpdateDto.getCategoryId())
+          .orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
+      product.setCategory(category);
+    }
+
     productMapper.update(product, productUpdateDto);
     return productRepository.save(product);
   }
