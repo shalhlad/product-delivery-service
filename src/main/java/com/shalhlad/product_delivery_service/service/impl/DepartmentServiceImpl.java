@@ -1,12 +1,14 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
 import com.shalhlad.product_delivery_service.dto.request.DepartmentCreationDto;
+import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateDto;
 import com.shalhlad.product_delivery_service.dto.request.ProductQuantityToChangeDto;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import com.shalhlad.product_delivery_service.entity.user.Employee;
 import com.shalhlad.product_delivery_service.exception.InvalidValueException;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
+import com.shalhlad.product_delivery_service.mapper.DepartmentMapper;
 import com.shalhlad.product_delivery_service.repository.DepartmentRepository;
 import com.shalhlad.product_delivery_service.repository.EmployeeRepository;
 import com.shalhlad.product_delivery_service.repository.ProductRepository;
@@ -24,13 +26,16 @@ public class DepartmentServiceImpl implements DepartmentService {
   private final DepartmentRepository departmentRepository;
   private final ProductRepository productRepository;
   private final EmployeeRepository employeeRepository;
+  private final DepartmentMapper departmentMapper;
 
   @Autowired
   public DepartmentServiceImpl(DepartmentRepository departmentRepository,
-      ProductRepository productRepository, EmployeeRepository employeeRepository) {
+      ProductRepository productRepository, EmployeeRepository employeeRepository,
+      DepartmentMapper departmentMapper) {
     this.departmentRepository = departmentRepository;
     this.productRepository = productRepository;
     this.employeeRepository = employeeRepository;
+    this.departmentMapper = departmentMapper;
   }
 
   @Override
@@ -84,5 +89,12 @@ public class DepartmentServiceImpl implements DepartmentService {
   public Department findByPrincipal(Principal principal) {
     Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
     return employee.getDepartment();
+  }
+
+  @Override
+  public Department update(Long id, DepartmentUpdateDto departmentUpdateDto) {
+    Department department = findById(id);
+    departmentMapper.update(department, departmentUpdateDto);
+    return departmentRepository.save(department);
   }
 }

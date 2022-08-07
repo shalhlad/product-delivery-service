@@ -1,6 +1,7 @@
 package com.shalhlad.product_delivery_service.controller;
 
 import com.shalhlad.product_delivery_service.dto.request.DepartmentCreationDto;
+import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateDto;
 import com.shalhlad.product_delivery_service.dto.request.ProductQuantityToChangeDto;
 import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithWarehouseDto;
 import com.shalhlad.product_delivery_service.mapper.DepartmentMapper;
@@ -61,6 +62,16 @@ public class DepartmentController {
   }
 
   @PatchMapping("/{id}")
+  @PreAuthorize("hasRole('DB_EDITOR')")
+  public DepartmentDetailsWithWarehouseDto update(
+      @PathVariable Long id,
+      @RequestBody @Valid DepartmentUpdateDto departmentUpdateDto,
+      BindingResult bindingResult) {
+    Utils.throwExceptionIfFailedValidation(bindingResult);
+    return mapper.toDetailsWithWarehouseDto(service.update(id, departmentUpdateDto));
+  }
+
+  @PatchMapping("/{id}/warehouse")
   @PreAuthorize("hasRole('WAREHOUSEMAN')")
   public DepartmentDetailsWithWarehouseDto changeProductQuantity(
       @PathVariable Long id,

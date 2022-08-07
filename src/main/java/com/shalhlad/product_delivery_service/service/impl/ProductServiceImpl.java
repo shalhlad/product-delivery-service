@@ -1,6 +1,7 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
 import com.shalhlad.product_delivery_service.dto.request.ProductCreationDto;
+import com.shalhlad.product_delivery_service.dto.request.ProductUpdateDto;
 import com.shalhlad.product_delivery_service.entity.product.Category;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
@@ -59,6 +60,16 @@ public class ProductServiceImpl implements ProductService {
   public Product findById(Long id) {
     return productRepository.findById(id)
         .orElseThrow(() -> new NotFoundException("Product not found with id: " + id));
+  }
+
+  @Override
+  public Product update(Long id, ProductUpdateDto productUpdateDto) {
+    Product product = findById(id);
+    Category category = categoryRepository.findById(productUpdateDto.getCategoryId())
+        .orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
+    product.setCategory(category);
+    productMapper.update(product, productUpdateDto);
+    return productRepository.save(product);
   }
 
 }

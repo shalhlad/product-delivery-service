@@ -1,6 +1,7 @@
 package com.shalhlad.product_delivery_service.controller;
 
 import com.shalhlad.product_delivery_service.dto.request.ProductCreationDto;
+import com.shalhlad.product_delivery_service.dto.request.ProductUpdateDto;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import com.shalhlad.product_delivery_service.service.ProductService;
 import com.shalhlad.product_delivery_service.util.Utils;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,6 +57,16 @@ public class ProductController {
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
     return service.create(productCreationDto);
+  }
+
+  @PatchMapping("/{id}")
+  @PreAuthorize("hasRole('DB_EDITOR')")
+  public Product update(
+      @PathVariable Long id,
+      @RequestBody @Valid ProductUpdateDto productUpdateDto,
+      BindingResult bindingResult) {
+    Utils.throwExceptionIfFailedValidation(bindingResult);
+    return service.update(id, productUpdateDto);
   }
 
 }

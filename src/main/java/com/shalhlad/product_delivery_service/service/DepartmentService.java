@@ -1,6 +1,7 @@
 package com.shalhlad.product_delivery_service.service;
 
 import com.shalhlad.product_delivery_service.dto.request.DepartmentCreationDto;
+import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateDto;
 import com.shalhlad.product_delivery_service.dto.request.ProductQuantityToChangeDto;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import java.security.Principal;
@@ -17,4 +18,6 @@ public interface DepartmentService {
       ProductQuantityToChangeDto productQuantityToChangeDto);
 
   Department findByPrincipal(Principal principal);
+
+  Department update(Long id, DepartmentUpdateDto departmentUpdateDto);
 }
