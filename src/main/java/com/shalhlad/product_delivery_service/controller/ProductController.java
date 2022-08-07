@@ -7,6 +7,7 @@ import com.shalhlad.product_delivery_service.service.ProductService;
 import com.shalhlad.product_delivery_service.util.Utils;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class ProductController {
   }
 
   @GetMapping
-  public Iterable<Product> getProducts(
+  public Page<Product> getProducts(
       @RequestParam(required = false) Long categoryId,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "25") int size,
@@ -51,7 +52,7 @@ public class ProductController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize("hasRole('DB_EDITOR')")
+  @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   public Product create(
       @RequestBody @Valid ProductCreationDto productCreationDto,
       BindingResult bindingResult) {
@@ -60,7 +61,7 @@ public class ProductController {
   }
 
   @PatchMapping("/{id}")
-  @PreAuthorize("hasRole('DB_EDITOR')")
+  @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   public Product update(
       @PathVariable Long id,
       @RequestBody @Valid ProductUpdateDto productUpdateDto,

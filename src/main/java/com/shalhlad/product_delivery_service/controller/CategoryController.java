@@ -43,7 +43,7 @@ public class CategoryController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize("hasRole('DB_EDITOR')")
+  @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   public Category create(
       @RequestBody @Valid CategoryCreationDto categoryCreationDto,
       BindingResult bindingResult) {
@@ -52,7 +52,7 @@ public class CategoryController {
   }
 
   @PatchMapping("/{id}")
-  @PreAuthorize("hasRole('DB_EDITOR')")
+  @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   public Category update(
       @PathVariable Long id,
       @RequestBody @Valid CategoryUpdateDto categoryUpdateDto,
@@ -63,7 +63,7 @@ public class CategoryController {
 
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PreAuthorize("hasRole('DB_EDITOR')")
+  @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   public void delete(@PathVariable Long id) {
     service.deleteById(id);
   }

@@ -53,7 +53,7 @@ public class DepartmentController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize("hasRole('DB_EDITOR')")
+  @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   public DepartmentDetailsWithWarehouseDto create(
       @RequestBody @Valid DepartmentCreationDto departmentCreationDto,
       BindingResult bindingResult) {
@@ -62,7 +62,7 @@ public class DepartmentController {
   }
 
   @PatchMapping("/{id}")
-  @PreAuthorize("hasRole('DB_EDITOR')")
+  @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   public DepartmentDetailsWithWarehouseDto update(
       @PathVariable Long id,
       @RequestBody @Valid DepartmentUpdateDto departmentUpdateDto,
