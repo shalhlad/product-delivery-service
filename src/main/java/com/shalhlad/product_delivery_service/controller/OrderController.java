@@ -1,5 +1,6 @@
 package com.shalhlad.product_delivery_service.controller;
 
+import com.shalhlad.product_delivery_service.dto.request.OrderOperations;
 import com.shalhlad.product_delivery_service.dto.request.OrderCreationDto;
 import com.shalhlad.product_delivery_service.dto.response.OrderDetailsDto;
 import com.shalhlad.product_delivery_service.entity.order.Stage;
@@ -38,7 +39,7 @@ public class OrderController {
 
   @GetMapping("/orders/{id}")
   public OrderDetailsDto getById(@PathVariable Long id) {
-    return mapper.toDetailsDto(service.getById(id));
+    return mapper.toDetailsDto(service.findById(id));
   }
 
   @GetMapping("/users/me/orders")
@@ -69,12 +70,12 @@ public class OrderController {
   }
 
   @PatchMapping("/orders/{id}")
-  @PreAuthorize("hasAnyRole({'CUSTOMER', 'COLLECTOR', 'COURIER'})")
-  public OrderDetailsDto changeState(
+  @PreAuthorize("isAuthenticated()")
+  public OrderDetailsDto changeStage(
       Principal principal,
       @PathVariable Long id,
-      @RequestParam Stage stage) {
-    return mapper.toDetailsDto(service.changeStage(principal, id, stage));
+      @RequestParam OrderOperations operation) {
+    return mapper.toDetailsDto(service.changeStage(principal, id, operation));
   }
 
   @GetMapping("/departments/{departmentId}/orders")

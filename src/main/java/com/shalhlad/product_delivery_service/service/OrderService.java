@@ -1,5 +1,6 @@
 package com.shalhlad.product_delivery_service.service;
 
+import com.shalhlad.product_delivery_service.dto.request.OrderOperations;
 import com.shalhlad.product_delivery_service.dto.request.OrderCreationDto;
 import com.shalhlad.product_delivery_service.entity.order.Order;
 import com.shalhlad.product_delivery_service.entity.order.Stage;
@@ -11,11 +12,11 @@ public interface OrderService {
 
   Order create(Principal principal, OrderCreationDto orderCreationDto);
 
-  Order getById(Long id);
+  Order findById(Long id);
 
   Page<Order> findAllByUserId(String userId, Pageable pageable);
 
-  Order changeStage(Principal principal, Long orderId, Stage newStage);
+  Order changeStage(Principal principal, Long orderId, OrderOperations operation);
 
   Page<Order> findAllByDepartmentAndStage(Principal principal, Long departmentId, Stage stage,
       Pageable pageable);

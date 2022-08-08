@@ -1,5 +1,6 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
+import com.shalhlad.product_delivery_service.dto.request.OrderOperations;
 import com.shalhlad.product_delivery_service.dto.request.OrderCreationDto;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.order.Order;
@@ -56,15 +57,12 @@ public class OrderServiceImpl implements OrderService {
         .orElseThrow(() -> new NotFoundException(
             "Department not found with id: " + orderCreationDto.getDepartmentId()));
 
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
-
+    User user = userRepository.findByEmail(email).orElseThrow();
     Map<Product, Integer> productWarehouse = department.getProductWarehouse();
-
     Map<Product, OrderedProductDetails> orderedProducts = new HashMap<>();
     orderCreationDto.getOrderedProducts().forEach((productId, quantity) -> {
-      if (quantity == 0) {
-        return;
+      if (quantity <= 0) {
+        throw new InvalidValueException("Quantity of product cannot be less or equal of 0");
       }
 
       Product product = productRepository.findById(productId)
@@ -92,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Order getById(Long id) {
+  public Order findById(Long id) {
     return orderRepository.findById(id)
         .orElseThrow(() -> new NotFoundException("Order not found with id: " + id));
   }
@@ -112,62 +110,43 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Order changeStage(Principal principal, Long orderId, Stage newStage) {
+  public Order changeStage(Principal principal, Long orderId, OrderOperations operation) {
     User user = userRepository.findByEmail(principal.getName()).orElseThrow();
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new NotFoundException("Order not found with id: " + orderId));
 
-    switch (user.getRole()) {
-      case ROLE_CUSTOMER -> {
-        if (!order.getUser().equals(user)) {
-          throw new NoRightsException("Order does not belongs to user");
-        }
-        if (newStage != Stage.CANCELED) {
-          throw new NoRightsException("User can only cancel order");
-        }
+    switch (operation) {
+      case CANCEL -> {
         if (order.getStage() != Stage.NEW) {
-          throw new NoRightsException("User can only cancel NEW order");
+          throw new NoRightsException("User can only cancel NEW orders");
         }
+        if (!order.getUser().equals(user)) {
+          throw new NoRightsException("Cannot cancel order because it is not belongs to current");
+        }
+        order.setStage(Stage.CANCELED);
       }
-      case ROLE_COLLECTOR, ROLE_COURIER -> {
+      case NEXT -> {
+        Stage currentStage = order.getStage();
+        Role userRole = user.getRole();
+        if (userRole != Role.ROLE_COLLECTOR && userRole != Role.ROLE_COURIER) {
+          throw new NoRightsException("Only collector and courier can manage order stage");
+        }
+
         Employee employee = employeeRepository.findById(user.getId()).orElseThrow();
         if (!employee.getDepartment().equals(order.getDepartment())) {
-          throw new NoRightsException("Employee can only process order of his department");
+          throw new NoRightsException("Employee can process orders only of his department");
         }
-        if (user.getRole() == Role.ROLE_COLLECTOR) {
-          if (newStage != Stage.APPROVED && newStage != Stage.COLLECTING
-              && newStage != Stage.COLLECTED) {
-            throw new NoRightsException(
-                "Collector can only approve, start collecting and finish collecting order");
-          }
-          if (order.getStage() != Stage.NEW && order.getStage() != Stage.APPROVED
-              && order.getStage() != Stage.COLLECTING) {
-            throw new NoRightsException(
-                "Collector can only change stage of NEW, APPROVED or COLLECTING order");
-          }
-        } else {
-          if (newStage != Stage.IN_DELIVERY && newStage != Stage.GIVEN) {
-            throw new NoRightsException("Courier can only start delivering or give order");
-          }
-          if (order.getStage() != Stage.COLLECTED && order.getStage() != Stage.IN_DELIVERY) {
-            throw new NoRightsException(
-                "Courier can only change stage of COLLECTED, IN_DELIVERY order");
-          }
-        }
-      }
-      default -> throw new NoRightsException(
-          "Only customer, collector or courier can change stage of order");
-    }
-    order.setStage(newStage);
-    order.getStageHistory().put(newStage, new Date());
 
-    if (newStage == Stage.CANCELED) {
-      Department department = order.getDepartment();
-      Map<Product, Integer> warehouse = department.getProductWarehouse();
-      order.getOrderedProducts()
-          .forEach((p, od) -> warehouse.put(p, warehouse.getOrDefault(p, 0) + od.getQuantity()));
-      departmentRepository.save(department);
+        if (currentStage.canBeChangedByCollector() && userRole != Role.ROLE_COLLECTOR) {
+          throw new NoRightsException("Order of current stage can be manager only by collector");
+        } else if (currentStage.canBeChangedByCourier() && userRole != Role.ROLE_COURIER) {
+          throw new NoRightsException("Order of current stage can be managed only by courier");
+        }
+
+        order.setStage(currentStage.next());
+      }
     }
+
     return orderRepository.save(order);
   }
 
