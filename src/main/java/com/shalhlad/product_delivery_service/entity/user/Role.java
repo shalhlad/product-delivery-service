@@ -20,6 +20,7 @@ public enum Role implements GrantedAuthority {
   public boolean isEmployee() {
     return this == Role.ROLE_DEPARTMENT_HEAD ||
         this == Role.ROLE_COURIER ||
-        this == Role.ROLE_COLLECTOR;
+        this == Role.ROLE_COLLECTOR ||
+        this == Role.ROLE_WAREHOUSEMAN;
   }
 }
