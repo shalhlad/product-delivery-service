@@ -10,7 +10,7 @@ public interface EmployeeService {
 
   Iterable<Employee> findAllEmployeesOfAuthorizationDepartment(Principal principal);
 
-  Employee findEmployeeOfDepartmentByUserId(Principal principal, String userId);
+  Employee findEmployeeOfCurrentDepartmentByUserId(Principal principal, String userId);
 
   Employee recruit(Principal principal, UserRecruitRequestDto userRecruitRequestDto);
 
