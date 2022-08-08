@@ -60,7 +60,8 @@ public class EmployeeController {
   public EmployeeDetailsDto getEmployeeOfCurrentDepartmentByUserId(
       Principal principal,
       @PathVariable String userId) {
-    return employeeMapper.toDetailsDto(service.findEmployeeOfCurrentDepartmentByUserId(principal, userId));
+    return employeeMapper.toDetailsDto(
+        service.findEmployeeOfCurrentDepartmentByUserId(principal, userId));
   }
 
   @PostMapping("/employees")
