@@ -5,6 +5,7 @@ import com.shalhlad.product_delivery_service.dto.request.UserLoginDetailsDto;
 import com.shalhlad.product_delivery_service.entity.user.Role;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import com.shalhlad.product_delivery_service.exception.InvalidLoginOrPasswordException;
+import com.shalhlad.product_delivery_service.exception.InvalidValueException;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.security.jwt.JwtProvider;
 import com.shalhlad.product_delivery_service.service.AuthService;
@@ -35,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
   public User signUp(SignUpDetailsDto signUpDetailsDto) {
     final int USER_ID_LENGTH = 15;
     if (userRepository.existsByEmail(signUpDetailsDto.getEmail())) {
-      throw new RuntimeException(
+      throw new InvalidValueException(
           "User already exists with email: " + signUpDetailsDto.getEmail());
     }
 
