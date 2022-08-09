@@ -41,6 +41,12 @@ public class WebSecurityConfig {
                 SecurityConstants.SIGN_UP_URL, SecurityConstants.SIGN_IN_URL).permitAll()
             .antMatchers(HttpMethod.GET,
                 "/products/**", "/departments/**", "/categories/**").permitAll()
+            .antMatchers("/v3/api-docs",
+                "/configuration/ui",
+                "/swagger-resources/**",
+                "/configuration/security",
+                "/swagger-ui/**",
+                "/webjars/**").permitAll()
             .anyRequest().authenticated()
         )
         .exceptionHandling(handling -> handling

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/profile")
@@ -35,13 +36,13 @@ public class ProfileController {
   }
 
   @GetMapping
-  public UserDetailsDto getProfileDetails(Principal principal) {
+  public UserDetailsDto getProfileDetails(@ApiIgnore Principal principal) {
     return mapToDetailsDto(service.getDetailsFromPrincipal(principal));
   }
 
   @PatchMapping
   public UserDetailsDto updateProfileDetails(
-      Principal principal,
+      @ApiIgnore Principal principal,
       @RequestBody @Valid UserDetailsUpdateDto userDetailsUpdateDto,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);

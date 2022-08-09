@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @PreAuthorize("isAuthenticated()")
@@ -44,7 +45,7 @@ public class OrderController {
 
   @GetMapping("/users/me/orders")
   public Page<OrderDetailsDto> getByPrincipal(
-      Principal principal,
+      @ApiIgnore Principal principal,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "25") int size) {
     String email = principal.getName();
@@ -62,7 +63,7 @@ public class OrderController {
   @PostMapping("/orders")
   @ResponseStatus(HttpStatus.CREATED)
   public OrderDetailsDto create(
-      Principal principal,
+      @ApiIgnore Principal principal,
       @RequestBody @Valid OrderCreationDto orderCreationDto,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
@@ -72,7 +73,7 @@ public class OrderController {
   @PatchMapping("/orders/{id}")
   @PreAuthorize("isAuthenticated()")
   public OrderDetailsDto changeStage(
-      Principal principal,
+      @ApiIgnore Principal principal,
       @PathVariable Long id,
       @RequestParam OrderOperations operation) {
     return mapper.toDetailsDto(service.changeStage(principal, id, operation));
@@ -81,7 +82,7 @@ public class OrderController {
   @GetMapping("/departments/{departmentId}/orders")
   @PreAuthorize("hasAnyRole({'COLLECTOR', 'COURIER'})")
   public Page<OrderDetailsDto> getOrdersOfDepartmentByStage(
-      Principal principal,
+      @ApiIgnore Principal principal,
       @PathVariable Long departmentId,
       @RequestParam Stage stage,
       @RequestParam(defaultValue = "0") int page,

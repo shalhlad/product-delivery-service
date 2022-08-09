@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 public class EmployeeController {
@@ -41,7 +42,8 @@ public class EmployeeController {
 
   @GetMapping("/departments/me/employees")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
-  public Iterable<EmployeeDetailsDto> getEmployeesOfCurrentDepartment(Principal principal) {
+  public Iterable<EmployeeDetailsDto> getEmployeesOfCurrentDepartment(
+      @ApiIgnore Principal principal) {
     return employeeMapper.toDetailsDto(
         service.findAllEmployeesOfAuthorizationDepartment(principal));
   }
@@ -49,7 +51,7 @@ public class EmployeeController {
   @GetMapping("/departments/{departmentId}/employees")
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   public Iterable<EmployeeDetailsDto> getEmployeesOfCurrentDepartment(
-      Principal principal,
+      @ApiIgnore Principal principal,
       @PathVariable Long departmentId) {
     return employeeMapper.toDetailsDto(
         service.findAllEmployeesByDepartmentId(principal, departmentId));
@@ -58,7 +60,7 @@ public class EmployeeController {
   @GetMapping("/employees//{userId}")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
   public EmployeeDetailsDto getEmployeeOfCurrentDepartmentByUserId(
-      Principal principal,
+      @ApiIgnore Principal principal,
       @PathVariable String userId) {
     return employeeMapper.toDetailsDto(
         service.findEmployeeOfCurrentDepartmentByUserId(principal, userId));
@@ -68,7 +70,7 @@ public class EmployeeController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   public EmployeeDetailsDto recruitUser(
-      Principal principal,
+      @ApiIgnore Principal principal,
       @RequestBody @Valid UserRecruitRequestDto userRecruitRequestDto,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
@@ -78,7 +80,7 @@ public class EmployeeController {
   @PatchMapping("/employees/{userId}")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
   public EmployeeDetailsDto changeEmployeePosition(
-      Principal principal,
+      @ApiIgnore Principal principal,
       @PathVariable String userId,
       @RequestParam Role position) {
     return employeeMapper.toDetailsDto(service.changePosition(principal, userId, position));
@@ -86,7 +88,7 @@ public class EmployeeController {
 
   @DeleteMapping("/employees/{userId}")
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
-  public UserDetailsDto fireEmployee(Principal principal, @PathVariable String userId) {
+  public UserDetailsDto fireEmployee(@ApiIgnore Principal principal, @PathVariable String userId) {
     return userMapper.toDetailsDto(service.fire(principal, userId));
   }
 
