@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/product_delivery_service
+    driver-class-name: org.postgresql.Driver
+    username: pds_user
+    password: pdpass
+
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    open-in-view: true
+    properties:
+      hibernate.hbm2ddl.import_files_sql_extractor: org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+server:
+  servlet:
+    context-path: /api
+
+jwt:
+  secret: Minsk
+  expiration-days: 10
