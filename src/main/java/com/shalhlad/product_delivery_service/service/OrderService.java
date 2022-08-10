@@ -16,10 +16,12 @@ public interface OrderService {
 
   Page<Order> findAllByUserId(String userId, Pageable pageable);
 
-  Order changeStage(Principal principal, Long orderId, OrderOperations operation);
+  Order applyOperation(Principal principal, Long orderId, OrderOperations operation);
 
   Page<Order> findAllByDepartmentAndStage(Principal principal, Long departmentId, Stage stage,
       Pageable pageable);
 
   Page<Order> findAllByEmail(String email, Pageable pageable);
+
+  Iterable<Order> findOrderInHandlingByPrincipal(Principal principal);
 }

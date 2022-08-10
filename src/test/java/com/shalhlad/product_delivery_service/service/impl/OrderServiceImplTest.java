@@ -273,7 +273,7 @@ public class OrderServiceImplTest {
     when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
 
-    Order actual = service.changeStage(principal, 1L, OrderOperations.CANCEL);
+    Order actual = service.applyOperation(principal, 1L, OrderOperations.CANCEL);
     assertThat(actual).isEqualTo(order);
   }
 
@@ -286,7 +286,7 @@ public class OrderServiceImplTest {
     when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
     assertThatExceptionOfType(NoRightsException.class).isThrownBy(
-        () -> service.changeStage(principal, 1L, OrderOperations.CANCEL));
+        () -> service.applyOperation(principal, 1L, OrderOperations.CANCEL));
   }
 
   @Test
@@ -298,7 +298,7 @@ public class OrderServiceImplTest {
     when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
     assertThatExceptionOfType(NoRightsException.class).isThrownBy(
-        () -> service.changeStage(principal, 1L, OrderOperations.CANCEL));
+        () -> service.applyOperation(principal, 1L, OrderOperations.CANCEL));
   }
 
   @Test
@@ -312,7 +312,7 @@ public class OrderServiceImplTest {
     when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
     assertThatExceptionOfType(NoRightsException.class).isThrownBy(
-        () -> service.changeStage(principal, 1L, OrderOperations.NEXT));
+        () -> service.applyOperation(principal, 1L, OrderOperations.NEXT));
   }
 
   @Test
@@ -330,7 +330,7 @@ public class OrderServiceImplTest {
     when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(firstEmployee));
 
     assertThatExceptionOfType(NoRightsException.class).isThrownBy(
-        () -> service.changeStage(principal, 1L, OrderOperations.NEXT));
+        () -> service.applyOperation(principal, 1L, OrderOperations.NEXT));
   }
 
   @Test
@@ -345,7 +345,7 @@ public class OrderServiceImplTest {
     when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(firstEmployee));
 
     assertThatExceptionOfType(NoRightsException.class).isThrownBy(
-        () -> service.changeStage(principal, 1L, OrderOperations.NEXT));
+        () -> service.applyOperation(principal, 1L, OrderOperations.NEXT));
   }
 
   @Test
@@ -360,7 +360,7 @@ public class OrderServiceImplTest {
     when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(firstEmployee));
 
     assertThatExceptionOfType(NoRightsException.class).isThrownBy(
-        () -> service.changeStage(principal, 1L, OrderOperations.NEXT));
+        () -> service.applyOperation(principal, 1L, OrderOperations.NEXT));
   }
 
   @Test
@@ -375,7 +375,7 @@ public class OrderServiceImplTest {
     when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(firstEmployee));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
 
-    Order actual = service.changeStage(principal, 1L, OrderOperations.NEXT);
+    Order actual = service.applyOperation(principal, 1L, OrderOperations.NEXT);
     assertThat(actual).isEqualTo(order);
   }
 
@@ -391,7 +391,7 @@ public class OrderServiceImplTest {
     when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(firstEmployee));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
 
-    Order actual = service.changeStage(principal, 1L, OrderOperations.NEXT);
+    Order actual = service.applyOperation(principal, 1L, OrderOperations.NEXT);
     assertThat(actual).isEqualTo(order);
   }
 

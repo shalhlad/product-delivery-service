@@ -71,12 +71,11 @@ public class OrderController {
   }
 
   @PatchMapping("/orders/{id}")
-  @PreAuthorize("isAuthenticated()")
   public OrderDetailsDto changeStage(
       @ApiIgnore Principal principal,
       @PathVariable Long id,
       @RequestParam OrderOperations operation) {
-    return mapper.toDetailsDto(service.changeStage(principal, id, operation));
+    return mapper.toDetailsDto(service.applyOperation(principal, id, operation));
   }
 
   @GetMapping("/departments/{departmentId}/orders")
@@ -90,5 +89,11 @@ public class OrderController {
   ) {
     return mapper.toDetailsDto(service.findAllByDepartmentAndStage(principal, departmentId, stage,
         PageRequest.of(page, size)));
+  }
+
+  @GetMapping("/orders/handling")
+  @PreAuthorize("hasAnyRole({'COLLECTOR', 'COURIER'})")
+  public Iterable<OrderDetailsDto> getHandlingOrders(@ApiIgnore Principal principal) {
+    return mapper.toDetailsDto(service.findOrderInHandlingByPrincipal(principal));
   }
 }

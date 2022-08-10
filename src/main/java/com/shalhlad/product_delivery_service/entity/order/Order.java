@@ -20,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MapKeyEnumerated;
 import javax.persistence.MapKeyJoinColumn;
+import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,6 +46,10 @@ public class Order {
 
   @Column(nullable = false, length = 50)
   private String deliveryAddress;
+
+  @OneToOne
+  @JoinColumn(name = "order_handlers_id", referencedColumnName = "id")
+  private OrderHandlers orderHandlers;
 
   @ElementCollection
   @JoinTable(

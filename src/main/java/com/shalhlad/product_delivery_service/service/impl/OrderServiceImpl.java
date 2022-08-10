@@ -4,6 +4,7 @@ import com.shalhlad.product_delivery_service.dto.request.OrderCreationDto;
 import com.shalhlad.product_delivery_service.dto.request.OrderOperations;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.order.Order;
+import com.shalhlad.product_delivery_service.entity.order.OrderHandlers;
 import com.shalhlad.product_delivery_service.entity.order.OrderedProductDetails;
 import com.shalhlad.product_delivery_service.entity.order.Stage;
 import com.shalhlad.product_delivery_service.entity.product.Product;
@@ -15,6 +16,7 @@ import com.shalhlad.product_delivery_service.exception.NoRightsException;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
 import com.shalhlad.product_delivery_service.repository.DepartmentRepository;
 import com.shalhlad.product_delivery_service.repository.EmployeeRepository;
+import com.shalhlad.product_delivery_service.repository.OrderHandlersRepository;
 import com.shalhlad.product_delivery_service.repository.OrderRepository;
 import com.shalhlad.product_delivery_service.repository.ProductRepository;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
@@ -38,16 +40,18 @@ public class OrderServiceImpl implements OrderService {
   private final DepartmentRepository departmentRepository;
   private final ProductRepository productRepository;
   private final EmployeeRepository employeeRepository;
+  private final OrderHandlersRepository orderHandlersRepository;
 
   @Autowired
   public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository,
       DepartmentRepository departmentRepository, ProductRepository productRepository,
-      EmployeeRepository employeeRepository) {
+      EmployeeRepository employeeRepository, OrderHandlersRepository orderHandlersRepository) {
     this.orderRepository = orderRepository;
     this.userRepository = userRepository;
     this.departmentRepository = departmentRepository;
     this.productRepository = productRepository;
     this.employeeRepository = employeeRepository;
+    this.orderHandlersRepository = orderHandlersRepository;
   }
 
   @Override
@@ -83,6 +87,7 @@ public class OrderServiceImpl implements OrderService {
             .department(department)
             .deliveryAddress(orderCreationDto.getDeliveryAddress())
             .orderedProducts(orderedProducts)
+            .orderHandlers(orderHandlersRepository.save(new OrderHandlers()))
             .stage(Stage.NEW)
             .stageHistory(Map.of(Stage.NEW, new Date()))
             .build()
@@ -110,7 +115,13 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Order changeStage(Principal principal, Long orderId, OrderOperations operation) {
+  public Iterable<Order> findOrderInHandlingByPrincipal(Principal principal) {
+    Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
+    return orderRepository.findAllByOrderHandlersCurrentHandler(employee);
+  }
+
+  @Override
+  public Order applyOperation(Principal principal, Long orderId, OrderOperations operation) {
     User user = userRepository.findByEmail(principal.getName()).orElseThrow();
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new NotFoundException("Order not found with id: " + orderId));
@@ -124,9 +135,10 @@ public class OrderServiceImpl implements OrderService {
           throw new NoRightsException("Cannot cancel order because it is not belongs to current");
         }
         order.setStage(Stage.CANCELED);
+        Map<Stage, Date> stageHistory = order.getStageHistory();
+        stageHistory.put(Stage.CANCELED, new Date());
       }
       case NEXT -> {
-        Stage currentStage = order.getStage();
         Role userRole = user.getRole();
         if (userRole != Role.ROLE_COLLECTOR && userRole != Role.ROLE_COURIER) {
           throw new NoRightsException("Only collector and courier can manage order stage");
@@ -137,14 +149,79 @@ public class OrderServiceImpl implements OrderService {
           throw new NoRightsException("Employee can process orders only of his department");
         }
 
-        if (currentStage.canBeChangedByCollector() && userRole != Role.ROLE_COLLECTOR) {
-          throw new NoRightsException("Order of current stage can be manager only by collector");
-        } else if (currentStage.canBeChangedByCourier() && userRole != Role.ROLE_COURIER) {
-          throw new NoRightsException("Order of current stage can be managed only by courier");
+        Stage currentStage = order.getStage();
+        OrderHandlers orderHandlers = order.getOrderHandlers();
+
+        if (currentStage.canBeChangedByCollector()) {
+          if (userRole != Role.ROLE_COLLECTOR) {
+            throw new NoRightsException("Order of current stage can be manager only by collector");
+          }
+          if (orderHandlers.getCollector() == null) {
+            throw new InvalidValueException("First you need start order handling");
+          } else if (!orderHandlers.getCollector().equals(employee)) {
+            throw new NoRightsException(
+                "Cannot change order stage because it handles by another collector");
+          }
+        } else if (currentStage.canBeChangedByCourier()) {
+          if (userRole != Role.ROLE_COURIER) {
+            throw new NoRightsException("Order of current stage can be manager only by courier");
+          }
+          if (orderHandlers.getCourier() == null) {
+            throw new InvalidValueException("First you need start order handling");
+          } else if (!orderHandlers.getCourier().equals(employee)) {
+            throw new NoRightsException(
+                "Cannot change order stage because it handles by another courier");
+          }
         }
 
-        order.setStage(currentStage.next());
+        try {
+          order.setStage(currentStage.next());
+        } catch (UnsupportedOperationException e) {
+          throw new InvalidValueException(e.getMessage());
+        }
+
+        if (order.getStage() == Stage.COLLECTED ||
+            order.getStage() == Stage.GIVEN) {
+          orderHandlers.setCurrentHandler(null);
+        }
+
+        Map<Stage, Date> stageHistory = order.getStageHistory();
+        stageHistory.put(order.getStage(), new Date());
       }
+      case HANDLE -> {
+        Role userRole = user.getRole();
+        if (userRole != Role.ROLE_COLLECTOR && userRole != Role.ROLE_COURIER) {
+          throw new NoRightsException("Only collector and courier can manage order stage");
+        }
+
+        Employee employee = employeeRepository.findById(user.getId()).orElseThrow();
+        if (orderRepository.existsByOrderHandlersCurrentHandler(employee)) {
+          throw new NoRightsException("You cannot handle more that 1 order at the same time");
+        }
+
+        if (!employee.getDepartment().equals(order.getDepartment())) {
+          throw new NoRightsException("Employee can process orders only of his department");
+        }
+
+        Stage currentStage = order.getStage();
+        OrderHandlers orderHandlers = order.getOrderHandlers();
+
+        if (userRole == Role.ROLE_COLLECTOR) {
+          if (currentStage != Stage.NEW) {
+            throw new InvalidValueException(
+                "Cannot handle order, because it canceled or already handled by another collector");
+          }
+          orderHandlers.setCollector(employee);
+        } else {
+          if (!currentStage.canBeChangedByCollector() && currentStage != Stage.COLLECTED) {
+            throw new InvalidValueException(
+                "Cannot handle order, because it canceled or already handled by another courier");
+          }
+          orderHandlers.setCourier(employee);
+        }
+        orderHandlers.setCurrentHandler(employee);
+      }
+
     }
 
     return orderRepository.save(order);
