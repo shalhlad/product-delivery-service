@@ -26,7 +26,7 @@ public class SwaggerConfig {
         .securityContexts(List.of(securityContext()))
         .securitySchemes(List.of(apiKey()))
         .select()
-        .apis(RequestHandlerSelectors.any())
+        .apis(RequestHandlerSelectors.basePackage("com.shalhlad.product_delivery_service"))
         .paths(PathSelectors.any())
         .build();
   }

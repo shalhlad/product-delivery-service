@@ -21,7 +21,8 @@ public interface OrderMapper {
 
   @Mappings({
       @Mapping(target = "orderPrice", expression = "java(calculateOrderPrice(order))"),
-      @Mapping(target = "orderedProducts", qualifiedByName = "orderedProductsMapToList")
+      @Mapping(target = "orderedProducts", qualifiedByName = "orderedProductsMapToList"),
+      @Mapping(target = "nextStage", expression = "java(calculateNextStage(order))")
   })
   OrderDetailsDto toDetailsDto(Order order);
 
@@ -30,6 +31,14 @@ public interface OrderMapper {
   default Page<OrderDetailsDto> toDetailsDto(Page<Order> orders) {
     List<OrderDetailsDto> mappedContent = toDetailsDto(orders.getContent());
     return new PageImpl<>(mappedContent, orders.getPageable(), orders.getTotalElements());
+  }
+
+  default String calculateNextStage(Order order) {
+    try {
+      return order.getStage().next().toString();
+    } catch (UnsupportedOperationException e) {
+      return "-";
+    }
   }
 
   default BigDecimal calculateOrderPrice(Order order) {

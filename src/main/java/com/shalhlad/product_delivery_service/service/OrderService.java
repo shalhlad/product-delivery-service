@@ -23,7 +23,9 @@ public interface OrderService {
 
   Page<Order> findAllByEmail(String email, Pageable pageable);
 
-  Iterable<Order> findOrderInHandlingByPrincipal(Principal principal);
+  Iterable<Order> findAllInProcessingByPrincipal(Principal principal);
 
   Iterable<Order> findActiveOrdersByEmail(String email);
+
+  Page<Order> findAllProcessableOrders(Principal principal, Pageable pageable);
 }

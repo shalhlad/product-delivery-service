@@ -8,6 +8,7 @@ import com.shalhlad.product_delivery_service.mapper.EmployeeMapper;
 import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.service.EmployeeService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.ApiOperation;
 import java.security.Principal;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,8 @@ public class EmployeeController {
 
   @GetMapping("/departments/me/employees")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
+  @ApiOperation(value = "getEmployeesOfAuthorizedEmployeeDepartment",
+      notes = "Returns all employees of authorized employee department")
   public Iterable<EmployeeDetailsDto> getEmployeesOfCurrentDepartment(
       @ApiIgnore Principal principal) {
     return employeeMapper.toDetailsDto(
@@ -50,7 +53,9 @@ public class EmployeeController {
 
   @GetMapping("/departments/{departmentId}/employees")
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
-  public Iterable<EmployeeDetailsDto> getEmployeesOfCurrentDepartment(
+  @ApiOperation(value = "getEmployeesOfDepartmentByDepartmentId",
+      notes = "Returns all employees of department by department id")
+  public Iterable<EmployeeDetailsDto> getEmployeesOfDepartmentByDepartmentId(
       @ApiIgnore Principal principal,
       @PathVariable Long departmentId) {
     return employeeMapper.toDetailsDto(
@@ -59,6 +64,8 @@ public class EmployeeController {
 
   @GetMapping("/employees//{userId}")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
+  @ApiOperation(value = "getEmployeeOfAuthorizedEmployeeDepartmentByEmployeeId",
+      notes = "Returns employee of authorized employee department by employee id")
   public EmployeeDetailsDto getEmployeeOfCurrentDepartmentByUserId(
       @ApiIgnore Principal principal,
       @PathVariable String userId) {
@@ -69,6 +76,8 @@ public class EmployeeController {
   @PostMapping("/employees")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
+  @ApiOperation(value = "recruitUser",
+      notes = "Makes customer the employee of authorized employee department")
   public EmployeeDetailsDto recruitUser(
       @ApiIgnore Principal principal,
       @RequestBody @Valid UserRecruitRequestDto userRecruitRequestDto,
@@ -79,6 +88,8 @@ public class EmployeeController {
 
   @PatchMapping("/employees/{userId}")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
+  @ApiOperation(value = "changeEmployeePosition",
+      notes = "Change employee position of authorized employee department")
   public EmployeeDetailsDto changeEmployeePosition(
       @ApiIgnore Principal principal,
       @PathVariable String userId,
@@ -88,6 +99,8 @@ public class EmployeeController {
 
   @DeleteMapping("/employees/{userId}")
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
+  @ApiOperation(value = "fireEmployeeByUserId",
+      notes = "Fire employee of authorized employee department by userId")
   public UserDetailsDto fireEmployee(@ApiIgnore Principal principal, @PathVariable String userId) {
     return userMapper.toDetailsDto(service.fire(principal, userId));
   }

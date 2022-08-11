@@ -5,6 +5,7 @@ import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateDto;
 import com.shalhlad.product_delivery_service.entity.product.Category;
 import com.shalhlad.product_delivery_service.service.CategoryService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,11 +33,13 @@ public class CategoryController {
   }
 
   @GetMapping
+  @ApiOperation(value = "getAllCategories", notes = "Returns all categories")
   public Iterable<Category> getAll() {
     return service.findAll();
   }
 
   @GetMapping("/{id}")
+  @ApiOperation(value = "getCategoryById", notes = "Returns category by id")
   public Category getById(@PathVariable Long id) {
     return service.findById(id);
   }
@@ -44,6 +47,7 @@ public class CategoryController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
+  @ApiOperation(value = "createCategory", notes = "Creates category")
   public Category create(
       @RequestBody @Valid CategoryCreationDto categoryCreationDto,
       BindingResult bindingResult) {
@@ -53,6 +57,7 @@ public class CategoryController {
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
+  @ApiOperation(value = "updateCategory", notes = "Updates category fields")
   public Category update(
       @PathVariable Long id,
       @RequestBody @Valid CategoryUpdateDto categoryUpdateDto,
@@ -64,6 +69,7 @@ public class CategoryController {
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
+  @ApiOperation(value = "deleteCategory", notes = "Deletes category")
   public void delete(@PathVariable Long id) {
     service.deleteById(id);
   }

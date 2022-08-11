@@ -7,6 +7,7 @@ import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithW
 import com.shalhlad.product_delivery_service.mapper.DepartmentMapper;
 import com.shalhlad.product_delivery_service.service.DepartmentService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.ApiOperation;
 import java.security.Principal;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,18 +38,21 @@ public class DepartmentController {
   }
 
   @GetMapping("/{id}")
+  @ApiOperation(value = "getDepartmentById", notes = "Returns department by id")
   public DepartmentDetailsWithWarehouseDto getById(@PathVariable Long id) {
     return mapper.toDetailsWithWarehouseDto(service.findById(id));
   }
 
   @GetMapping("/me")
   @PreAuthorize("hasAnyRole({'COLLECTOR', 'COURIER', 'DEPARTMENT_HEAD'})")
+  @ApiOperation(value = "getDepartmentByAuthorization", notes = "Returns department of authorized employee")
   public DepartmentDetailsWithWarehouseDto getByAuthorization(
       @ApiIgnore Principal principal) {
     return mapper.toDetailsWithWarehouseDto(service.findByPrincipal(principal));
   }
 
   @GetMapping
+  @ApiOperation(value = "getAllDepartments", notes = "Returns all departments")
   public Iterable<DepartmentDetailsWithWarehouseDto> getAll() {
     return mapper.toDetailsWithWarehouseDto(service.findAll());
   }
@@ -56,6 +60,7 @@ public class DepartmentController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
+  @ApiOperation(value = "createDepartment", notes = "Creates department")
   public DepartmentDetailsWithWarehouseDto create(
       @RequestBody @Valid DepartmentCreationDto departmentCreationDto,
       BindingResult bindingResult) {
@@ -65,6 +70,7 @@ public class DepartmentController {
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
+  @ApiOperation(value = "updateDepartment", notes = "Update department fields")
   public DepartmentDetailsWithWarehouseDto update(
       @PathVariable Long id,
       @RequestBody @Valid DepartmentUpdateDto departmentUpdateDto,
@@ -75,6 +81,8 @@ public class DepartmentController {
 
   @PatchMapping("/{id}/warehouse")
   @PreAuthorize("hasRole('WAREHOUSEMAN')")
+  @ApiOperation(value = "updateProductQuantityInWarehouse",
+      notes = "Updates quantity of products in department's warehouse by department id")
   public DepartmentDetailsWithWarehouseDto changeProductQuantity(
       @PathVariable Long id,
       @RequestBody @Valid ProductQuantityToChangeDto productQuantityToChangeDto,

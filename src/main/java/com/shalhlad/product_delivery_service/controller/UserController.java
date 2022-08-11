@@ -3,6 +3,7 @@ package com.shalhlad.product_delivery_service.controller;
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsDto;
 import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.service.UserService;
+import io.swagger.annotations.ApiOperation;
 import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ public class UserController {
 
   @GetMapping
   @PreAuthorize("hasRole('ADMIN')")
+  @ApiOperation(value = "getAllUsers", notes = "Returns all users")
   public Page<UserDetailsDto> getUsers(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "15") int size
@@ -39,11 +41,13 @@ public class UserController {
   }
 
   @GetMapping("/me")
+  @ApiOperation(value = "getAuthorizedUser", notes = "Returns authorized user")
   public UserDetailsDto getByPrincipal(@ApiIgnore Principal principal) {
     return mapper.toDetailsDto(service.findByEmail(principal.getName()));
   }
 
   @GetMapping("/{userId}")
+  @ApiOperation(value = "getUserByUserId", notes = "Returns user by userId")
   public UserDetailsDto getByUserId(@PathVariable String userId) {
     return mapper.toDetailsDto(service.findByUserId(userId));
   }

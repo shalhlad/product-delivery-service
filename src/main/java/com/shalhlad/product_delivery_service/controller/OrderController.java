@@ -7,6 +7,7 @@ import com.shalhlad.product_delivery_service.entity.order.Stage;
 import com.shalhlad.product_delivery_service.mapper.OrderMapper;
 import com.shalhlad.product_delivery_service.service.OrderService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.ApiOperation;
 import java.security.Principal;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +40,13 @@ public class OrderController {
   }
 
   @GetMapping("/orders/{id}")
+  @ApiOperation(value = "getOrderById", notes = "Returns order by id")
   public OrderDetailsDto getById(@PathVariable Long id) {
     return mapper.toDetailsDto(service.findById(id));
   }
 
   @GetMapping("/users/me/orders")
+  @ApiOperation(value = "getAllOrdersOfAuthorizedUser", notes = "Returns all orders of authorized user")
   public Page<OrderDetailsDto> getAllByPrincipal(
       @ApiIgnore Principal principal,
       @RequestParam(defaultValue = "0") int page,
@@ -53,6 +56,8 @@ public class OrderController {
   }
 
   @GetMapping("/users/me/orders/active")
+  @ApiOperation(value = "getAllActiveOrdersOfAuthorizedUser",
+      notes = "Returns all active orders of authorized user")
   public Iterable<OrderDetailsDto> getAllActiveByPrincipal(
       @ApiIgnore Principal principal) {
     String email = principal.getName();
@@ -60,6 +65,8 @@ public class OrderController {
   }
 
   @GetMapping("/users/{userId}/orders")
+  @ApiOperation(value = "getAllOrdersOfUserByUserId",
+      notes = "Returns all orders of user by userId")
   public Page<OrderDetailsDto> getByUserId(
       @PathVariable String userId,
       @RequestParam(defaultValue = "0") int page,
@@ -69,6 +76,7 @@ public class OrderController {
 
   @PostMapping("/orders")
   @ResponseStatus(HttpStatus.CREATED)
+  @ApiOperation(value = "createOrder", notes = "Create order")
   public OrderDetailsDto create(
       @ApiIgnore Principal principal,
       @RequestBody @Valid OrderCreationDto orderCreationDto,
@@ -78,7 +86,8 @@ public class OrderController {
   }
 
   @PatchMapping("/orders/{id}")
-  public OrderDetailsDto changeStage(
+  @ApiOperation(value = "applyOrderOperationById", notes = "Applies an operation on order by orderId")
+  public OrderDetailsDto applyOperation(
       @ApiIgnore Principal principal,
       @PathVariable Long id,
       @RequestParam OrderOperations operation) {
@@ -87,6 +96,8 @@ public class OrderController {
 
   @GetMapping("/departments/{departmentId}/orders")
   @PreAuthorize("hasAnyRole({'COLLECTOR', 'COURIER'})")
+  @ApiOperation(value = "getAllOrdersOfDepartmentByStageByDepartmentId",
+      notes = "Returns all order of department by department id and stage")
   public Page<OrderDetailsDto> getOrdersOfDepartmentByStage(
       @ApiIgnore Principal principal,
       @PathVariable Long departmentId,
@@ -98,9 +109,24 @@ public class OrderController {
         PageRequest.of(page, size)));
   }
 
-  @GetMapping("/orders/handling")
+  @GetMapping("/orders/processable")
   @PreAuthorize("hasAnyRole({'COLLECTOR', 'COURIER'})")
-  public Iterable<OrderDetailsDto> getHandlingOrders(@ApiIgnore Principal principal) {
-    return mapper.toDetailsDto(service.findOrderInHandlingByPrincipal(principal));
+  @ApiOperation(value = "getAllProcessableOrders",
+      notes = "Returns all orders that authorized employee can start process")
+  public Page<OrderDetailsDto> getProcessableOrders(
+      @ApiIgnore Principal principal,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "15") int size
+  ) {
+    return mapper.toDetailsDto(
+        service.findAllProcessableOrders(principal, PageRequest.of(page, size)));
+  }
+
+  @GetMapping("/orders/in-processing")
+  @PreAuthorize("hasAnyRole({'COLLECTOR', 'COURIER'})")
+  @ApiOperation(value = "getOrdersInProcessing",
+      notes = "Returns all orders that in processing by authorized employee")
+  public Iterable<OrderDetailsDto> getOrdersInProcessing(@ApiIgnore Principal principal) {
+    return mapper.toDetailsDto(service.findAllInProcessingByPrincipal(principal));
   }
 }

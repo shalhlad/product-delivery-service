@@ -3,6 +3,7 @@ package com.shalhlad.product_delivery_service.controller;
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsDto;
 import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.service.AdminService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,11 +26,13 @@ public class AdminController {
   }
 
   @GetMapping
+  @ApiOperation(value = "getAllAdmins", notes = "Returns all admins")
   public Iterable<UserDetailsDto> getAll() {
     return mapper.toDetailsDto(service.findAll());
   }
 
   @GetMapping("/{userId}")
+  @ApiOperation(value = "getAdminByUserId", notes = "Returns admin by userId")
   public UserDetailsDto getByUserId(@PathVariable String userId) {
     return mapper.toDetailsDto(service.findByUserId(userId));
   }

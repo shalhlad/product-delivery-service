@@ -24,4 +24,7 @@ public interface OrderRepository extends PagingAndSortingRepository<Order, Long>
   boolean existsByUserAndStageNotAndStageNot(User user, Stage first, Stage second);
 
   Iterable<Order> findAllByUserAndStageNotAndStageNot(User user, Stage first, Stage second);
+
+  Page<Order> findAllByDepartmentAndStageNotAndOrderHandlersCourier(Department department,
+      Stage stage, Employee courier, Pageable pageable);
 }

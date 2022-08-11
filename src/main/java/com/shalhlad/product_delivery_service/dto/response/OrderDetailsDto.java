@@ -17,5 +17,6 @@ public class OrderDetailsDto {
   private BigDecimal orderPrice;
   private UserDetailsDto user;
   private String stage;
+  private String nextStage;
   private Map<Stage, Date> stageHistory;
 }

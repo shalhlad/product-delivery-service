@@ -34,7 +34,7 @@ public class User {
   private String userId;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "card_id", referencedColumnName = "id")
+  @JoinColumn(name = "card_id", referencedColumnName = "id", nullable = false)
   private Card card;
 
   @Column(nullable = false, length = 50)

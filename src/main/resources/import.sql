@@ -53,20 +53,28 @@ values (1, 29, 1),
        (3, 6, 9),
        (3, 18, 10);
 
+insert into cards (discount_in_percents, number_of_orders)
+values (0.0, 0),
+       (0.0, 0),
+       (0.0, 0),
+       (0.0, 0),
+       (0.0, 0),
+       (0.0, 0);
+
 /*password is "root" for all rows */
-insert into users (email, encrypted_password, first_name, registration_date, role, user_id)
+insert into users (email, encrypted_password, first_name, registration_date, card_id, role, user_id)
 values ('admin1@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Kiryl', now(), 'ROLE_ADMIN', 'HBOpigA8m00zc5Z'),
+        'Kiryl', now(), 1, 'ROLE_ADMIN', 'HBOpigA8m00zc5Z'),
        ('admin2@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Anton', now(), 'ROLE_ADMIN', 'kiQ1s2IxzFnp86P'),
+        'Anton', now(), 2, 'ROLE_ADMIN', 'kiQ1s2IxzFnp86P'),
        ('dbeditor@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Alexei', now(), 'ROLE_DB_EDITOR', 'uXf6gx7WmC9bqAq'),
+        'Alexei', now(), 3, 'ROLE_DB_EDITOR', 'uXf6gx7WmC9bqAq'),
        ('dephead@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Mikhail', now(), 'ROLE_DEPARTMENT_HEAD', 'ed0t5iYzoCqpN5Z'),
+        'Mikhail', now(), 4, 'ROLE_DEPARTMENT_HEAD', 'ed0t5iYzoCqpN5Z'),
        ('collector1@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Denis', now(), 'ROLE_COLLECTOR', 'ccuRZwJRnySB9As'),
+        'Denis', now(), 5, 'ROLE_COLLECTOR', 'ccuRZwJRnySB9As'),
        ('courier1@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Nikolay', now(), 'ROLE_COURIER', 'f50jqzAEhbWbGHO');
+        'Nikolay', now(), 6, 'ROLE_COURIER', 'f50jqzAEhbWbGHO');
 
 insert into employees (id, department_id)
 values (4, 1),

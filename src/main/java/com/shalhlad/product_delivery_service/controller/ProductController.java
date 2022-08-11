@@ -5,6 +5,7 @@ import com.shalhlad.product_delivery_service.dto.request.ProductUpdateDto;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import com.shalhlad.product_delivery_service.service.ProductService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,7 @@ public class ProductController {
   }
 
   @GetMapping
+  @ApiOperation(value = "getAllProducts", notes = "Returns all products")
   public Page<Product> getProducts(
       @RequestParam(required = false) Long categoryId,
       @RequestParam(defaultValue = "0") int page,
@@ -46,6 +48,7 @@ public class ProductController {
   }
 
   @GetMapping("/{id}")
+  @ApiOperation(value = "getProductById", notes = "Returns product by id")
   public Product getById(@PathVariable Long id) {
     return service.findById(id);
   }
@@ -53,6 +56,7 @@ public class ProductController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
+  @ApiOperation(value = "createProduct", notes = "Create product")
   public Product create(
       @RequestBody @Valid ProductCreationDto productCreationDto,
       BindingResult bindingResult) {
@@ -62,6 +66,7 @@ public class ProductController {
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
+  @ApiOperation(value = "updateProducts", notes = "Updates product fields by product id")
   public Product update(
       @PathVariable Long id,
       @RequestBody @Valid ProductUpdateDto productUpdateDto,

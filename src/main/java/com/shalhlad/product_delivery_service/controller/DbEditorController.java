@@ -3,6 +3,7 @@ package com.shalhlad.product_delivery_service.controller;
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsDto;
 import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.service.DbEditorService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,21 +29,25 @@ public class DbEditorController {
   }
 
   @GetMapping
+  @ApiOperation(value = "getAllDbEditors", notes = "Returns all DB editors")
   public Iterable<UserDetailsDto> getAll() {
     return mapper.toDetailsDto(dbEditorService.findAll());
   }
 
   @GetMapping("/{userId}")
+  @ApiOperation(value = "getDbEditorByUserId", notes = "Returns DB editor by userId")
   public UserDetailsDto getByUserId(@PathVariable String userId) {
     return mapper.toDetailsDto(dbEditorService.findByUserId(userId));
   }
 
   @PostMapping
+  @ApiOperation(value = "addDbEditor", notes = "Makes customer the DB editor by userId")
   public UserDetailsDto add(@RequestParam String userId) {
     return mapper.toDetailsDto(dbEditorService.add(userId));
   }
 
   @DeleteMapping("/{userId}")
+  @ApiOperation(value = "removeDbEditor", notes = "Makes DB editor the customer by userId")
   public UserDetailsDto remove(@PathVariable String userId) {
     return mapper.toDetailsDto(dbEditorService.remove(userId));
   }

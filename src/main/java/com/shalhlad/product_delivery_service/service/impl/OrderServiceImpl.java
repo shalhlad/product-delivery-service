@@ -152,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Iterable<Order> findOrderInHandlingByPrincipal(Principal principal) {
+  public Iterable<Order> findAllInProcessingByPrincipal(Principal principal) {
     Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
     return orderRepository.findAllByOrderHandlersCurrentHandler(employee);
   }
@@ -161,6 +161,22 @@ public class OrderServiceImpl implements OrderService {
   public Iterable<Order> findActiveOrdersByEmail(String email) {
     User user = userRepository.findByEmail(email).orElseThrow();
     return orderRepository.findAllByUserAndStageNotAndStageNot(user, Stage.GIVEN, Stage.CANCELED);
+  }
+
+  @Override
+  public Page<Order> findAllProcessableOrders(Principal principal, Pageable pageable) {
+    Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
+    Department department = employee.getDepartment();
+    Page<Order> page;
+    if (employee.getRole() == Role.ROLE_COLLECTOR) {
+      page = orderRepository.findAllByDepartmentAndStage(department, Stage.NEW, pageable);
+    } else if (employee.getRole() == Role.ROLE_COURIER) {
+      page = orderRepository.findAllByDepartmentAndStageNotAndOrderHandlersCourier(department,
+          Stage.CANCELED, employee, pageable);
+    } else {
+      throw new NoRightsException("Only collector and courier can handle orders");
+    }
+    return page;
   }
 
   @Override

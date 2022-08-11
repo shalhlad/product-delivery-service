@@ -7,6 +7,7 @@ import com.shalhlad.product_delivery_service.dto.response.UserDetailsDto;
 import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.service.AuthService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -30,6 +31,7 @@ public class AuthController {
 
   @PostMapping("/sign-up")
   @ResponseStatus(HttpStatus.CREATED)
+  @ApiOperation(value = "signUp", notes = "Sign up as new user")
   public UserDetailsDto signUp(
       @RequestBody @Valid SignUpDetailsDto signUpDetailsDto,
       BindingResult bindingResult) {
@@ -38,6 +40,7 @@ public class AuthController {
   }
 
   @PostMapping("/sign-in")
+  @ApiOperation(value = "signIn", notes = "Sign in by existing user")
   public AccessTokenResponse signIn(
       @RequestBody @Valid UserLoginDetailsDto userLoginDetailsDto,
       BindingResult bindingResult) {

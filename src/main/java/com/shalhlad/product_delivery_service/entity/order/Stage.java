@@ -47,7 +47,7 @@ public enum Stage {
   CANCELED {
     @Override
     public Stage next() {
-      throw new UnsupportedOperationException("there is no next stage after CANCELED");
+      throw new UnsupportedOperationException("There is no next stage after CANCELED");
     }
   };
 
