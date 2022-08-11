@@ -17,23 +17,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 @Mapper(uses = {UserMapper.class, DepartmentMapper.class})
-public interface OrderMapper {
+public abstract class OrderMapper {
 
   @Mappings({
       @Mapping(target = "orderPrice", expression = "java(calculateOrderPrice(order))"),
       @Mapping(target = "orderedProducts", qualifiedByName = "orderedProductsMapToList"),
       @Mapping(target = "nextStage", expression = "java(calculateNextStage(order))")
   })
-  OrderDetailsDto toDetailsDto(Order order);
+  public abstract OrderDetailsDto toDetailsDto(Order order);
 
-  List<OrderDetailsDto> toDetailsDto(Iterable<Order> orders);
+  public abstract List<OrderDetailsDto> toDetailsDto(Iterable<Order> orders);
 
-  default Page<OrderDetailsDto> toDetailsDto(Page<Order> orders) {
+  public Page<OrderDetailsDto> toDetailsDto(Page<Order> orders) {
     List<OrderDetailsDto> mappedContent = toDetailsDto(orders.getContent());
     return new PageImpl<>(mappedContent, orders.getPageable(), orders.getTotalElements());
   }
 
-  default String calculateNextStage(Order order) {
+
+  protected String calculateNextStage(Order order) {
     try {
       return order.getStage().next().toString();
     } catch (UnsupportedOperationException e) {
@@ -41,7 +42,7 @@ public interface OrderMapper {
     }
   }
 
-  default BigDecimal calculateOrderPrice(Order order) {
+  protected BigDecimal calculateOrderPrice(Order order) {
     return order.getOrderedProducts().values().stream()
         .map(od -> {
           BigDecimal priceOfOne = od.getPriceOfOne();
@@ -60,7 +61,7 @@ public interface OrderMapper {
   }
 
   @Named("orderedProductsMapToList")
-  default List<ProductWithQuantityAndDiscountDto> orderedProductsMapToList(
+  protected List<ProductWithQuantityAndDiscountDto> orderedProductsMapToList(
       Map<Product, OrderedProductDetails> orderedProducts) {
     return orderedProducts.entrySet().stream()
         .map(e -> {

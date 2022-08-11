@@ -15,19 +15,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 @Mapper
-public interface UserMapper {
+public abstract class UserMapper {
 
-  UserDetailsDto toDetailsDto(User user);
+  public abstract UserDetailsDto toDetailsDto(User user);
 
-  List<UserDetailsDto> toDetailsDto(Iterable<User> users);
+  public abstract List<UserDetailsDto> toDetailsDto(Iterable<User> users);
 
-  default Page<UserDetailsDto> toDetailsDto(Page<User> users) {
+  public Page<UserDetailsDto> toDetailsDto(Page<User> users) {
     List<UserDetailsDto> mappedContent = toDetailsDto(users.getContent());
     return new PageImpl<>(mappedContent, users.getPageable(), users.getTotalElements());
   }
 
   @Mapping(target = "department", ignore = true)
-  Employee toEmployee(User user);
+  public abstract Employee toEmployee(User user);
 
   @Mappings({
       @Mapping(target = "userId", ignore = true),
@@ -38,7 +38,8 @@ public interface UserMapper {
       @Mapping(target = "email", ignore = true),
       @Mapping(target = "firstName", nullValuePropertyMappingStrategy = IGNORE),
       @Mapping(target = "lastName", nullValuePropertyMappingStrategy = IGNORE),
-      @Mapping(target = "patronymic", nullValuePropertyMappingStrategy = IGNORE)
+      @Mapping(target = "patronymic", nullValuePropertyMappingStrategy = IGNORE),
+      @Mapping(target = "card", ignore = true)
   })
-  void update(@MappingTarget User user, UserDetailsUpdateDto userDetailsUpdateDto);
+  public abstract void update(@MappingTarget User user, UserDetailsUpdateDto userDetailsUpdateDto);
 }

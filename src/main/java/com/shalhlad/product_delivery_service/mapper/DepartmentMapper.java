@@ -17,25 +17,28 @@ import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 
 @Mapper
-public interface DepartmentMapper {
+public abstract class DepartmentMapper {
 
   @Mapping(target = "productWarehouse", qualifiedByName = "productQuantityMapToList")
-  DepartmentDetailsWithWarehouseDto toDetailsWithWarehouseDto(Department department);
+  public abstract DepartmentDetailsWithWarehouseDto toDetailsWithWarehouseDto(
+      Department department);
 
-  List<DepartmentDetailsWithWarehouseDto> toDetailsWithWarehouseDto(
+  public abstract List<DepartmentDetailsWithWarehouseDto> toDetailsWithWarehouseDto(
       Iterable<Department> departments);
 
-  DepartmentDetailsDto toDetailsDto(Department department);
+  public abstract DepartmentDetailsDto toDetailsDto(Department department);
 
   @Mappings({
       @Mapping(target = "productWarehouse", ignore = true),
       @Mapping(target = "id", ignore = true),
       @Mapping(target = "address", nullValuePropertyMappingStrategy = IGNORE)
   })
-  void update(@MappingTarget Department department, DepartmentUpdateDto departmentUpdateDto);
+  public abstract void update(@MappingTarget Department department,
+      DepartmentUpdateDto departmentUpdateDto);
+
 
   @Named("productQuantityMapToList")
-  default List<ProductWithQuantityDto> productQuantityMapToList(
+  protected List<ProductWithQuantityDto> productQuantityMapToList(
       Map<Product, Integer> productQuantityMap) {
     return productQuantityMap.entrySet().stream()
         .map(e -> new ProductWithQuantityDto(e.getKey(), e.getValue()))
