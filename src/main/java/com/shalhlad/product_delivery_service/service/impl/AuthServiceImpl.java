@@ -2,14 +2,17 @@ package com.shalhlad.product_delivery_service.service.impl;
 
 import com.shalhlad.product_delivery_service.dto.request.SignUpDetailsDto;
 import com.shalhlad.product_delivery_service.dto.request.UserLoginDetailsDto;
+import com.shalhlad.product_delivery_service.entity.user.Card;
 import com.shalhlad.product_delivery_service.entity.user.Role;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import com.shalhlad.product_delivery_service.exception.InvalidLoginOrPasswordException;
 import com.shalhlad.product_delivery_service.exception.InvalidValueException;
+import com.shalhlad.product_delivery_service.repository.CardRepository;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.security.jwt.JwtProvider;
 import com.shalhlad.product_delivery_service.service.AuthService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +24,16 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
 
   private final UserRepository userRepository;
+  private final CardRepository cardRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtProvider jwtProvider;
 
   @Autowired
-  public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
+  public AuthServiceImpl(UserRepository userRepository, CardRepository cardRepository,
+      PasswordEncoder passwordEncoder,
       JwtProvider jwtProvider) {
     this.userRepository = userRepository;
+    this.cardRepository = cardRepository;
     this.passwordEncoder = passwordEncoder;
     this.jwtProvider = jwtProvider;
   }
@@ -40,12 +46,17 @@ public class AuthServiceImpl implements AuthService {
           "User already exists with email: " + signUpDetailsDto.getEmail());
     }
 
+    Card card = new Card();
+    card.setDiscountInPercents(BigDecimal.ZERO);
+    card.setNumberOfOrders(0);
+
     User user = new User();
     user.setEmail(signUpDetailsDto.getEmail());
     user.setEncryptedPassword(passwordEncoder.encode(signUpDetailsDto.getPassword()));
     user.setRegistrationDate(new Date());
     user.setFirstName(signUpDetailsDto.getFirstName());
     user.setRole(Role.ROLE_CUSTOMER);
+    user.setCard(cardRepository.save(card));
 
     String userId;
     do {

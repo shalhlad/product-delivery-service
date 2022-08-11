@@ -33,7 +33,7 @@ public class Department {
   @ElementCollection
   @JoinTable(
       name = "product_warehouse",
-      joinColumns = @JoinColumn(name = "department_id", referencedColumnName = "id")
+      joinColumns = @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
   )
   @MapKeyJoinColumn(name = "product_id", referencedColumnName = "id")
   @Column(name = "quantity", nullable = false)

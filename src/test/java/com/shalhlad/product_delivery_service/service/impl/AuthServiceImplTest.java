@@ -10,9 +10,11 @@ import static org.mockito.Mockito.when;
 
 import com.shalhlad.product_delivery_service.dto.request.SignUpDetailsDto;
 import com.shalhlad.product_delivery_service.dto.request.UserLoginDetailsDto;
+import com.shalhlad.product_delivery_service.entity.user.Card;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import com.shalhlad.product_delivery_service.exception.InvalidLoginOrPasswordException;
 import com.shalhlad.product_delivery_service.exception.InvalidValueException;
+import com.shalhlad.product_delivery_service.repository.CardRepository;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.security.jwt.JwtProvider;
 import com.shalhlad.product_delivery_service.util.Utils;
@@ -36,6 +38,8 @@ public class AuthServiceImplTest {
   private PasswordEncoder passwordEncoder;
   @Mock
   private JwtProvider jwtProvider;
+  @Mock
+  private CardRepository cardRepository;
 
   @BeforeEach
   public void setUp() throws Exception {
@@ -46,12 +50,15 @@ public class AuthServiceImplTest {
   public void signUp() {
     User user = new User();
     user.setId(1L);
+    Card card = new Card();
+    card.setId(1L);
 
     when(userRepository.existsByEmail(anyString())).thenReturn(false);
     when(userRepository.existsByUserId(anyString())).thenReturn(false);
     Mockito.mockStatic(Utils.class).when(() -> Utils.generateUserId(anyInt())).thenReturn("test");
     when(userRepository.save(any(User.class))).thenReturn(user);
     when(passwordEncoder.encode(anyString())).thenReturn("test");
+    when(cardRepository.save(any(Card.class))).thenReturn(card);
 
     SignUpDetailsDto signUpDetailsDto = new SignUpDetailsDto();
     signUpDetailsDto.setEmail("test");

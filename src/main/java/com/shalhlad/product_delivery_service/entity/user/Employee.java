@@ -17,7 +17,7 @@ import org.hibernate.Hibernate;
 public class Employee extends User {
 
   @ManyToOne
-  @JoinColumn(name = "department_id", referencedColumnName = "id")
+  @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
   private Department department;
 
   @Override

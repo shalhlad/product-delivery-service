@@ -2,6 +2,7 @@ package com.shalhlad.product_delivery_service.entity.user;
 
 import java.util.Date;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,6 +12,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -29,6 +32,10 @@ public class User {
 
   @Column(unique = true, nullable = false, length = 50)
   private String userId;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "card_id", referencedColumnName = "id")
+  private Card card;
 
   @Column(nullable = false, length = 50)
   private String firstName;

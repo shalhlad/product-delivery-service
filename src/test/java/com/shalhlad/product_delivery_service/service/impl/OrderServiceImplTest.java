@@ -11,19 +11,24 @@ import com.shalhlad.product_delivery_service.dto.request.OrderCreationDto;
 import com.shalhlad.product_delivery_service.dto.request.OrderOperations;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.order.Order;
+import com.shalhlad.product_delivery_service.entity.order.OrderHandlers;
 import com.shalhlad.product_delivery_service.entity.order.Stage;
 import com.shalhlad.product_delivery_service.entity.product.Product;
+import com.shalhlad.product_delivery_service.entity.user.Card;
 import com.shalhlad.product_delivery_service.entity.user.Employee;
 import com.shalhlad.product_delivery_service.entity.user.Role;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import com.shalhlad.product_delivery_service.exception.InvalidValueException;
 import com.shalhlad.product_delivery_service.exception.NoRightsException;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
+import com.shalhlad.product_delivery_service.repository.CardRepository;
 import com.shalhlad.product_delivery_service.repository.DepartmentRepository;
 import com.shalhlad.product_delivery_service.repository.EmployeeRepository;
+import com.shalhlad.product_delivery_service.repository.OrderHandlersRepository;
 import com.shalhlad.product_delivery_service.repository.OrderRepository;
 import com.shalhlad.product_delivery_service.repository.ProductRepository;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +59,10 @@ public class OrderServiceImplTest {
   private ProductRepository productRepository;
   @Mock
   private EmployeeRepository employeeRepository;
+  @Mock
+  private CardRepository cardRepository;
+  @Mock
+  private OrderHandlersRepository orderHandlersRepository;
 
   private Product firstProduct;
   private Product secondProduct;
@@ -65,6 +74,8 @@ public class OrderServiceImplTest {
   private Principal principal;
   private Pageable pageable;
   private Page<Order> page;
+  private Card card;
+  private OrderHandlers orderHandlers;
 
   @BeforeEach
   public void setUp() throws Exception {
@@ -101,6 +112,11 @@ public class OrderServiceImplTest {
     order.setStage(Stage.NEW);
     order.setDepartment(department);
     order.setDeliveryAddress("test");
+    order.setStageHistory(new HashMap<>());
+
+    orderHandlers = new OrderHandlers();
+    orderHandlers.setId(1L);
+    order.setOrderHandlers(orderHandlers);
 
     firstEmployee = new Employee();
     firstEmployee.setId(3L);
@@ -111,6 +127,13 @@ public class OrderServiceImplTest {
     principal = () -> "Test";
     pageable = PageRequest.of(0, 1);
     page = new PageImpl<>(List.of(order), pageable, 1);
+
+    card = new Card();
+    card.setId(1L);
+    card.setNumberOfOrders(0);
+    card.setDiscountInPercents(BigDecimal.ZERO);
+
+    firstUser.setCard(card);
   }
 
 
@@ -129,6 +152,8 @@ public class OrderServiceImplTest {
     when(productRepository.findById(firstProduct.getId())).thenReturn(Optional.of(firstProduct));
     when(productRepository.findById(secondProduct.getId())).thenReturn(Optional.of(secondProduct));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
+    when(cardRepository.save(any(Card.class))).thenReturn(card);
+    when(orderHandlersRepository.save(any(OrderHandlers.class))).thenReturn(orderHandlers);
 
     Order actual = service.create(principal, orderCreationDto);
     assertThat(actual).isEqualTo(order);
@@ -370,10 +395,15 @@ public class OrderServiceImplTest {
     order.setStage(Stage.NEW);
     order.setDepartment(department);
 
+    orderHandlers.setCurrentHandler(firstEmployee);
+    orderHandlers.setCollector(firstEmployee);
+
     when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(firstUser));
     when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
     when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(firstEmployee));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
+    when(cardRepository.save(any(Card.class))).thenReturn(card);
+    when(orderHandlersRepository.save(any(OrderHandlers.class))).thenReturn(orderHandlers);
 
     Order actual = service.applyOperation(principal, 1L, OrderOperations.NEXT);
     assertThat(actual).isEqualTo(order);
@@ -386,10 +416,15 @@ public class OrderServiceImplTest {
     order.setStage(Stage.COLLECTED);
     order.setDepartment(department);
 
+    orderHandlers.setCurrentHandler(firstEmployee);
+    orderHandlers.setCourier(firstEmployee);
+
     when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(firstUser));
     when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
     when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(firstEmployee));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
+    when(cardRepository.save(any(Card.class))).thenReturn(card);
+    when(orderHandlersRepository.save(any(OrderHandlers.class))).thenReturn(orderHandlers);
 
     Order actual = service.applyOperation(principal, 1L, OrderOperations.NEXT);
     assertThat(actual).isEqualTo(order);

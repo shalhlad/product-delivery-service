@@ -13,7 +13,7 @@ public class OrderDetailsDto {
   private Long id;
   private DepartmentDetailsDto department;
   private String deliveryAddress;
-  private List<ProductWithQuantityDto> orderedProducts;
+  private List<ProductWithQuantityAndDiscountDto> orderedProducts;
   private BigDecimal orderPrice;
   private UserDetailsDto user;
   private String stage;

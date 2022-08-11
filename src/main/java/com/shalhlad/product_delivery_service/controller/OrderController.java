@@ -44,12 +44,19 @@ public class OrderController {
   }
 
   @GetMapping("/users/me/orders")
-  public Page<OrderDetailsDto> getByPrincipal(
+  public Page<OrderDetailsDto> getAllByPrincipal(
       @ApiIgnore Principal principal,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "25") int size) {
     String email = principal.getName();
     return mapper.toDetailsDto(service.findAllByEmail(email, PageRequest.of(page, size)));
+  }
+
+  @GetMapping("/users/me/orders/active")
+  public Iterable<OrderDetailsDto> getAllActiveByPrincipal(
+      @ApiIgnore Principal principal) {
+    String email = principal.getName();
+    return mapper.toDetailsDto(service.findActiveOrdersByEmail(email));
   }
 
   @GetMapping("/users/{userId}/orders")

@@ -16,9 +16,12 @@ import lombok.Setter;
 public class OrderedProductDetails {
 
   @Column(precision = 5, scale = 2, nullable = false)
-  private BigDecimal price;
+  private BigDecimal priceOfOne;
 
   @Column(nullable = false)
   private Integer quantity;
+
+  @Column(precision = 2, scale = 1, nullable = false)
+  private BigDecimal discountInPercents;
 
 }

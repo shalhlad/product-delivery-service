@@ -8,12 +8,14 @@ import com.shalhlad.product_delivery_service.entity.order.OrderHandlers;
 import com.shalhlad.product_delivery_service.entity.order.OrderedProductDetails;
 import com.shalhlad.product_delivery_service.entity.order.Stage;
 import com.shalhlad.product_delivery_service.entity.product.Product;
+import com.shalhlad.product_delivery_service.entity.user.Card;
 import com.shalhlad.product_delivery_service.entity.user.Employee;
 import com.shalhlad.product_delivery_service.entity.user.Role;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import com.shalhlad.product_delivery_service.exception.InvalidValueException;
 import com.shalhlad.product_delivery_service.exception.NoRightsException;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
+import com.shalhlad.product_delivery_service.repository.CardRepository;
 import com.shalhlad.product_delivery_service.repository.DepartmentRepository;
 import com.shalhlad.product_delivery_service.repository.EmployeeRepository;
 import com.shalhlad.product_delivery_service.repository.OrderHandlersRepository;
@@ -21,6 +23,7 @@ import com.shalhlad.product_delivery_service.repository.OrderRepository;
 import com.shalhlad.product_delivery_service.repository.ProductRepository;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.service.OrderService;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,17 +44,38 @@ public class OrderServiceImpl implements OrderService {
   private final ProductRepository productRepository;
   private final EmployeeRepository employeeRepository;
   private final OrderHandlersRepository orderHandlersRepository;
+  private final CardRepository cardRepository;
 
   @Autowired
   public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository,
       DepartmentRepository departmentRepository, ProductRepository productRepository,
-      EmployeeRepository employeeRepository, OrderHandlersRepository orderHandlersRepository) {
+      EmployeeRepository employeeRepository, OrderHandlersRepository orderHandlersRepository,
+      CardRepository cardRepository) {
     this.orderRepository = orderRepository;
     this.userRepository = userRepository;
     this.departmentRepository = departmentRepository;
     this.productRepository = productRepository;
     this.employeeRepository = employeeRepository;
     this.orderHandlersRepository = orderHandlersRepository;
+    this.cardRepository = cardRepository;
+  }
+
+  private BigDecimal calculateDiscount(Integer numberOfOrders) {
+    BigDecimal result;
+    if (numberOfOrders < 5) {
+      result = new BigDecimal("0.0");
+    } else if (numberOfOrders < 10) {
+      result = new BigDecimal("1.0");
+    } else if (numberOfOrders < 15) {
+      result = new BigDecimal("1.5");
+    } else if (numberOfOrders < 25) {
+      result = new BigDecimal("2.5");
+    } else if (numberOfOrders < 40) {
+      result = new BigDecimal("4.0");
+    } else {
+      result = new BigDecimal("5");
+    }
+    return result;
   }
 
   @Override
@@ -62,6 +86,12 @@ public class OrderServiceImpl implements OrderService {
             "Department not found with id: " + orderCreationDto.getDepartmentId()));
 
     User user = userRepository.findByEmail(email).orElseThrow();
+    if (orderRepository.existsByUserAndStageNotAndStageNot(user, Stage.CANCELED, Stage.GIVEN)) {
+      throw new NoRightsException("User cannot have more than one active order");
+    }
+
+    BigDecimal discount = user.getCard().getDiscountInPercents();
+
     Map<Product, Integer> productWarehouse = department.getProductWarehouse();
     Map<Product, OrderedProductDetails> orderedProducts = new HashMap<>();
     orderCreationDto.getOrderedProducts().forEach((productId, quantity) -> {
@@ -73,13 +103,20 @@ public class OrderServiceImpl implements OrderService {
           .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
       if (productWarehouse.getOrDefault(product, 0) >= quantity) {
         productWarehouse.put(product, productWarehouse.get(product) - quantity);
-        orderedProducts.put(product, OrderedProductDetails.of(product.getPrice(), quantity));
+        orderedProducts.put(product,
+            OrderedProductDetails.of(product.getPrice(), quantity, discount));
       } else {
         throw new InvalidValueException(
             "Cannot order products because the quantity to order more products in warehouse");
       }
     });
     departmentRepository.save(department);
+
+    Card card = user.getCard();
+    card.setNumberOfOrders(card.getNumberOfOrders() + 1);
+    card.setDiscountInPercents(calculateDiscount(card.getNumberOfOrders()));
+
+    cardRepository.save(card);
 
     return orderRepository.save(
         Order.builder()
@@ -121,6 +158,12 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  public Iterable<Order> findActiveOrdersByEmail(String email) {
+    User user = userRepository.findByEmail(email).orElseThrow();
+    return orderRepository.findAllByUserAndStageNotAndStageNot(user, Stage.GIVEN, Stage.CANCELED);
+  }
+
+  @Override
   public Order applyOperation(Principal principal, Long orderId, OrderOperations operation) {
     User user = userRepository.findByEmail(principal.getName()).orElseThrow();
     Order order = orderRepository.findById(orderId)
@@ -137,6 +180,11 @@ public class OrderServiceImpl implements OrderService {
         order.setStage(Stage.CANCELED);
         Map<Stage, Date> stageHistory = order.getStageHistory();
         stageHistory.put(Stage.CANCELED, new Date());
+
+        Card card = user.getCard();
+        card.setNumberOfOrders(card.getNumberOfOrders() - 1);
+        card.setDiscountInPercents(calculateDiscount(card.getNumberOfOrders()));
+        cardRepository.save(card);
       }
       case NEXT -> {
         Role userRole = user.getRole();

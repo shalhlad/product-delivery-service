@@ -5,7 +5,6 @@ import com.shalhlad.product_delivery_service.entity.order.Order;
 import com.shalhlad.product_delivery_service.entity.order.Stage;
 import com.shalhlad.product_delivery_service.entity.user.Employee;
 import com.shalhlad.product_delivery_service.entity.user.User;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -22,4 +21,7 @@ public interface OrderRepository extends PagingAndSortingRepository<Order, Long>
 
   Iterable<Order> findAllByOrderHandlersCurrentHandler(Employee currentHandler);
 
+  boolean existsByUserAndStageNotAndStageNot(User user, Stage first, Stage second);
+
+  Iterable<Order> findAllByUserAndStageNotAndStageNot(User user, Stage first, Stage second);
 }
