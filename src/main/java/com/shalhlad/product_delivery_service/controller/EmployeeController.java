@@ -1,9 +1,9 @@
 package com.shalhlad.product_delivery_service.controller;
 
+import com.shalhlad.product_delivery_service.dto.request.EmployeeRoles;
 import com.shalhlad.product_delivery_service.dto.request.UserRecruitRequest;
 import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
-import com.shalhlad.product_delivery_service.entity.user.Role;
 import com.shalhlad.product_delivery_service.service.EmployeeService;
 import com.shalhlad.product_delivery_service.util.Utils;
 import io.swagger.annotations.ApiOperation;
@@ -58,11 +58,11 @@ public class EmployeeController {
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
   @ApiOperation(value = "changeEmployeePositionByUserId",
       notes = "Change employee position of authorized employee department")
-  public EmployeeDetailsResponse changeEmployeePosition(
+  public EmployeeDetailsResponse changeEmployeeRole(
       @ApiIgnore Principal principal,
       @PathVariable String userId,
-      @RequestParam Role position) {
-    return service.changeRoleOfEmployee(principal, userId, position);
+      @RequestParam EmployeeRoles role) {
+    return service.changeRoleOfEmployee(principal, userId, role);
   }
 
   @DeleteMapping("/{userId}")

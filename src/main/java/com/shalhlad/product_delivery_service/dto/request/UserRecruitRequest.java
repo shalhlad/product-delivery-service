@@ -1,6 +1,5 @@
 package com.shalhlad.product_delivery_service.dto.request;
 
-import com.shalhlad.product_delivery_service.entity.user.Role;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -14,7 +13,7 @@ public class UserRecruitRequest {
   private String userId;
 
   @NotNull(message = "Role should not be null")
-  private Role role;
+  private EmployeeRoles role;
 
   @NotNull(message = "DepartmentId should not be null")
   @Min(value = 0, message = "DepartmentId should not be negative")

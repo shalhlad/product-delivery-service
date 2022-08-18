@@ -1,5 +1,6 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
+import com.shalhlad.product_delivery_service.dto.request.EmployeeRoles;
 import com.shalhlad.product_delivery_service.dto.request.UserRecruitRequest;
 import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
@@ -49,14 +50,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     User principalUser = userRepository.findByEmail(principal.getName()).orElseThrow();
     switch (principalUser.getRole()) {
       case ROLE_ADMIN -> {
-        if (userRecruitRequest.getRole() != Role.ROLE_DEPARTMENT_HEAD) {
+        if (userRecruitRequest.getRole() != EmployeeRoles.DEPARTMENT_HEAD) {
           throw new NoRightsException("Admin can only recruit department head");
         }
       }
       case ROLE_DEPARTMENT_HEAD -> {
-        if (userRecruitRequest.getRole() != Role.ROLE_WAREHOUSEMAN &&
-            userRecruitRequest.getRole() != Role.ROLE_COLLECTOR &&
-            userRecruitRequest.getRole() != Role.ROLE_COURIER) {
+        if (userRecruitRequest.getRole() != EmployeeRoles.WAREHOUSEMAN &&
+            userRecruitRequest.getRole() != EmployeeRoles.COLLECTOR &&
+            userRecruitRequest.getRole() != EmployeeRoles.COURIER) {
           throw new NoRightsException(
               "Department head can only recruit warehouseman, collector or courier");
         }
@@ -79,7 +80,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     Employee recruited = userMapper.toEmployee(targetUser);
     recruited.setDepartment(department);
-    recruited.setRole(userRecruitRequest.getRole());
+    recruited.setRole(userRecruitRequest.getRole().toEntityRole());
 
     userRepository.delete(targetUser);
 
@@ -127,10 +128,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public EmployeeDetailsResponse changeRoleOfEmployee(Principal principal, String userId,
-      Role role) {
-    if (role != Role.ROLE_COURIER &&
-        role != Role.ROLE_COLLECTOR &&
-        role != Role.ROLE_WAREHOUSEMAN) {
+      EmployeeRoles role) {
+    if (role != EmployeeRoles.COURIER &&
+        role != EmployeeRoles.COLLECTOR &&
+        role != EmployeeRoles.WAREHOUSEMAN) {
       throw new InvalidValueException(
           "Roles to change are ['COURIER', 'COLLECTOR', 'WAREHOUSEMAN']");
     }
@@ -146,7 +147,7 @@ public class EmployeeServiceImpl implements EmployeeService {
       throw new NoRightsException("Department head cannot change role of another department head");
     }
 
-    target.setRole(role);
+    target.setRole(role.toEntityRole());
 
     Employee saved = employeeRepository.save(target);
     return employeeMapper.toDetailsResponse(saved);
