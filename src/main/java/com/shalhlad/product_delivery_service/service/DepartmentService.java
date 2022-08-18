@@ -1,23 +1,28 @@
 package com.shalhlad.product_delivery_service.service;
 
-import com.shalhlad.product_delivery_service.dto.request.DepartmentCreationDto;
-import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateDto;
-import com.shalhlad.product_delivery_service.dto.request.ProductQuantityToChangeDto;
-import com.shalhlad.product_delivery_service.entity.department.Department;
-import java.security.Principal;
+import com.shalhlad.product_delivery_service.dto.request.DepartmentCreateRequest;
+import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateRequest;
+import com.shalhlad.product_delivery_service.dto.request.EmployeeRoles;
+import com.shalhlad.product_delivery_service.dto.request.ProductQuantityChangeRequest;
+import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsResponse;
+import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithWarehouseResponse;
+import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
 
 public interface DepartmentService {
 
-  Department create(DepartmentCreationDto departmentCreationDto);
+  DepartmentDetailsResponse createDepartment(DepartmentCreateRequest departmentCreateRequest);
 
-  Department findById(Long id);
+  DepartmentDetailsResponse findDepartmentById(Long id);
 
-  Iterable<Department> findAll();
+  Iterable<DepartmentDetailsResponse> findAllDepartments();
 
-  Department changeProductQuantity(Long departmentId,
-      ProductQuantityToChangeDto productQuantityToChangeDto);
+  DepartmentDetailsWithWarehouseResponse changeProductQuantityInDepartment(Long departmentId,
+      ProductQuantityChangeRequest productQuantityChangeRequest);
 
-  Department findByPrincipal(Principal principal);
+  DepartmentDetailsWithWarehouseResponse getDepartmentWithWarehouse(Long id);
 
-  Department update(Long id, DepartmentUpdateDto departmentUpdateDto);
+  DepartmentDetailsResponse updateDepartmentDetails(Long id,
+      DepartmentUpdateRequest departmentUpdateRequest);
+
+  Iterable<EmployeeDetailsResponse> findEmployeesOfDepartment(Long id, EmployeeRoles employeeRole);
 }

@@ -2,7 +2,7 @@ package com.shalhlad.product_delivery_service.mapper;
 
 import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
-import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateDto;
+import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateRequest;
 import com.shalhlad.product_delivery_service.entity.product.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,5 +16,5 @@ public interface CategoryMapper {
       @Mapping(target = "id", ignore = true),
       @Mapping(target = "name", nullValuePropertyMappingStrategy = IGNORE)
   })
-  void update(@MappingTarget Category category, CategoryUpdateDto categoryUpdateDto);
+  void update(@MappingTarget Category category, CategoryUpdateRequest categoryUpdateRequest);
 }

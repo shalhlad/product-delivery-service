@@ -1,16 +1,15 @@
 package com.shalhlad.product_delivery_service.controller;
 
-import com.shalhlad.product_delivery_service.dto.request.ProductCreationDto;
-import com.shalhlad.product_delivery_service.dto.request.ProductUpdateDto;
+import com.shalhlad.product_delivery_service.dto.request.ProductCreateRequest;
+import com.shalhlad.product_delivery_service.dto.request.ProductUpdateRequest;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import com.shalhlad.product_delivery_service.service.ProductService;
 import com.shalhlad.product_delivery_service.util.Utils;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -26,31 +25,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
 
   private final ProductService service;
-
-  @Autowired
-  public ProductController(ProductService service) {
-    this.service = service;
-  }
 
   @GetMapping
   @ApiOperation(value = "getAllProducts", notes = "Returns all products")
   public Page<Product> getProducts(
       @RequestParam(required = false) Long categoryId,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "25") int size,
-      @RequestParam(defaultValue = "name") String sortField
+      @RequestParam(required = false, defaultValue = "0") int page,
+      @RequestParam(required = false, defaultValue = "25") int size
   ) {
-    Sort sort = Sort.by(sortField);
-    return service.findAll(categoryId, PageRequest.of(page, size, sort));
+    return service.findAllProducts(categoryId, PageRequest.of(page, size));
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("/{productId}")
   @ApiOperation(value = "getProductById", notes = "Returns product by id")
-  public Product getById(@PathVariable Long id) {
-    return service.findById(id);
+  public Product getById(@PathVariable Long productId) {
+    return service.findProductById(productId);
   }
 
   @PostMapping
@@ -58,21 +51,21 @@ public class ProductController {
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   @ApiOperation(value = "createProduct", notes = "Create product")
   public Product create(
-      @RequestBody @Valid ProductCreationDto productCreationDto,
+      @RequestBody @Valid ProductCreateRequest productCreateRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return service.create(productCreationDto);
+    return service.createProduct(productCreateRequest);
   }
 
-  @PatchMapping("/{id}")
+  @PatchMapping("/{productId}")
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
-  @ApiOperation(value = "updateProducts", notes = "Updates product fields by product id")
+  @ApiOperation(value = "updateProductById", notes = "Updates product fields by product id")
   public Product update(
-      @PathVariable Long id,
-      @RequestBody @Valid ProductUpdateDto productUpdateDto,
+      @PathVariable Long productId,
+      @RequestBody @Valid ProductUpdateRequest productUpdateRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return service.update(id, productUpdateDto);
+    return service.updateProductById(productId, productUpdateRequest);
   }
 
 }

@@ -1,56 +1,60 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.entity.user.Role;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import com.shalhlad.product_delivery_service.exception.NoRightsException;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
+import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.service.DbEditorService;
 import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class DbEditorServiceImpl implements DbEditorService {
 
   private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
-  @Autowired
-  public DbEditorServiceImpl(UserRepository userRepository) {
-    this.userRepository = userRepository;
+  @Override
+  public Iterable<UserDetailsResponse> findAllDbEditors() {
+    Iterable<User> dbEditors = userRepository.findAllByRole(Role.ROLE_DB_EDITOR);
+    return userMapper.toDetailsResponse(dbEditors);
   }
 
   @Override
-  public Iterable<User> findAll() {
-    return userRepository.findAllByRole(Role.ROLE_DB_EDITOR);
-  }
-
-  @Override
-  public User findByUserId(String userId) {
+  public UserDetailsResponse findDbEditorByUserId(String userId) {
     return userRepository.findByUserIdAndRole(userId, Role.ROLE_DB_EDITOR)
+        .map(userMapper::toDetailsResponse)
         .orElseThrow(() -> new NotFoundException("DB editor not found with userId: " + userId));
   }
 
   @Override
-  public User add(String userId) {
+  public UserDetailsResponse addDbEditor(String userId) {
     User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new NotFoundException("User not found with userId: " + userId));
     if (user.getRole() != Role.ROLE_CUSTOMER) {
       throw new NoRightsException("Only user with role CUSTOMER can become DB editor");
     }
     user.setRole(Role.ROLE_DB_EDITOR);
-    return userRepository.save(user);
+
+    User saved = userRepository.save(user);
+    return userMapper.toDetailsResponse(saved);
   }
 
   @Override
-  public User remove(String userId) {
+  public UserDetailsResponse removeDbEditor(String userId) {
     User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new NotFoundException("User not found with userId: " + userId));
     if (user.getRole() != Role.ROLE_DB_EDITOR) {
       throw new NoRightsException("Target user is not DB editor");
     }
     user.setRole(Role.ROLE_CUSTOMER);
-    return userRepository.save(user);
+    User removed = userRepository.save(user);
+    return userMapper.toDetailsResponse(removed);
   }
 }

@@ -1,6 +1,6 @@
 package com.shalhlad.product_delivery_service.mapper;
 
-import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsDto;
+import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
 import com.shalhlad.product_delivery_service.entity.user.Employee;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import java.util.List;
@@ -11,7 +11,7 @@ public interface EmployeeMapper {
 
   User toUser(Employee employee);
 
-  EmployeeDetailsDto toDetailsDto(Employee employee);
+  EmployeeDetailsResponse toDetailsResponse(Employee employee);
 
-  List<EmployeeDetailsDto> toDetailsDto(Iterable<Employee> employees);
+  List<EmployeeDetailsResponse> toDetailsResponse(Iterable<Employee> employees);
 }

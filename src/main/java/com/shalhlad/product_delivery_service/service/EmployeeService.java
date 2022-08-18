@@ -1,22 +1,19 @@
 package com.shalhlad.product_delivery_service.service;
 
-import com.shalhlad.product_delivery_service.dto.request.UserRecruitRequestDto;
-import com.shalhlad.product_delivery_service.entity.user.Employee;
+import com.shalhlad.product_delivery_service.dto.request.UserRecruitRequest;
+import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.entity.user.Role;
-import com.shalhlad.product_delivery_service.entity.user.User;
 import java.security.Principal;
 
 public interface EmployeeService {
 
-  Iterable<Employee> findAllEmployeesOfAuthorizationDepartment(Principal principal);
+  EmployeeDetailsResponse findEmployeeByUserId(Principal principal, String userId);
 
-  Employee findEmployeeOfCurrentDepartmentByUserId(Principal principal, String userId);
+  EmployeeDetailsResponse recruitUser(Principal principal, UserRecruitRequest userRecruitRequest);
 
-  Employee recruit(Principal principal, UserRecruitRequestDto userRecruitRequestDto);
+  UserDetailsResponse fireEmployeeByUserId(Principal principal, String userId);
 
-  User fire(Principal principal, String userId);
+  EmployeeDetailsResponse changeRoleOfEmployee(Principal principal, String userId, Role newRole);
 
-  Employee changePosition(Principal principal, String userId, Role role);
-
-  Iterable<Employee> findAllEmployeesByDepartmentId(Principal principal, Long departmentId);
 }

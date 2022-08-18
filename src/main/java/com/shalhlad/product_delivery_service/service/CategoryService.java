@@ -1,18 +1,18 @@
 package com.shalhlad.product_delivery_service.service;
 
-import com.shalhlad.product_delivery_service.dto.request.CategoryCreationDto;
-import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateDto;
+import com.shalhlad.product_delivery_service.dto.request.CategoryCreateRequest;
+import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateRequest;
 import com.shalhlad.product_delivery_service.entity.product.Category;
 
 public interface CategoryService {
 
-  Category create(CategoryCreationDto categoryCreationDto);
+  Category createCategory(CategoryCreateRequest categoryCreateRequest);
 
-  Iterable<Category> findAll();
+  Iterable<Category> findAllCategories();
 
-  Category findById(Long id);
+  Category findCategoryById(Long id);
 
-  void deleteById(Long id);
+  void deleteCategoryById(Long id);
 
-  Category update(Long id, CategoryUpdateDto categoryUpdateDto);
+  Category updateCategoryById(Long id, CategoryUpdateRequest categoryUpdateRequest);
 }

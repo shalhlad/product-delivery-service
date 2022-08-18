@@ -2,10 +2,10 @@ package com.shalhlad.product_delivery_service.mapper;
 
 import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
-import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateDto;
-import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsDto;
-import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithWarehouseDto;
-import com.shalhlad.product_delivery_service.dto.response.ProductWithQuantityDto;
+import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateRequest;
+import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsResponse;
+import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithWarehouseResponse;
+import com.shalhlad.product_delivery_service.dto.response.ProductWithQuantityResponse;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import java.util.List;
@@ -20,13 +20,13 @@ import org.mapstruct.Named;
 public abstract class DepartmentMapper {
 
   @Mapping(target = "productWarehouse", qualifiedByName = "productQuantityMapToList")
-  public abstract DepartmentDetailsWithWarehouseDto toDetailsWithWarehouseDto(
+  public abstract DepartmentDetailsWithWarehouseResponse toDetailsWithWarehouseResponse(
       Department department);
 
-  public abstract List<DepartmentDetailsWithWarehouseDto> toDetailsWithWarehouseDto(
-      Iterable<Department> departments);
+  public abstract DepartmentDetailsResponse toDetailsResponse(Department department);
 
-  public abstract DepartmentDetailsDto toDetailsDto(Department department);
+  public abstract List<DepartmentDetailsResponse> toDetailsResponse(
+      Iterable<Department> departments);
 
   @Mappings({
       @Mapping(target = "productWarehouse", ignore = true),
@@ -34,14 +34,14 @@ public abstract class DepartmentMapper {
       @Mapping(target = "address", nullValuePropertyMappingStrategy = IGNORE)
   })
   public abstract void update(@MappingTarget Department department,
-      DepartmentUpdateDto departmentUpdateDto);
+      DepartmentUpdateRequest departmentUpdateRequest);
 
 
   @Named("productQuantityMapToList")
-  protected List<ProductWithQuantityDto> productQuantityMapToList(
+  protected List<ProductWithQuantityResponse> productQuantityMapToList(
       Map<Product, Integer> productQuantityMap) {
     return productQuantityMap.entrySet().stream()
-        .map(e -> new ProductWithQuantityDto(e.getKey(), e.getValue()))
+        .map(e -> new ProductWithQuantityResponse(e.getKey(), e.getValue()))
         .toList();
   }
 }

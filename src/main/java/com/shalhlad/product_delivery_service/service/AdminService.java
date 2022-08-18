@@ -1,11 +1,11 @@
 package com.shalhlad.product_delivery_service.service;
 
-import com.shalhlad.product_delivery_service.entity.user.User;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 
 public interface AdminService {
 
-  Iterable<User> findAll();
+  Iterable<UserDetailsResponse> findAllAdmins();
 
-  User findByUserId(String userId);
+  UserDetailsResponse findAdminByUserId(String userId);
 
 }

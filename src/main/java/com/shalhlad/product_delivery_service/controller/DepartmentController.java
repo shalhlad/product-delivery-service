@@ -1,16 +1,17 @@
 package com.shalhlad.product_delivery_service.controller;
 
-import com.shalhlad.product_delivery_service.dto.request.DepartmentCreationDto;
-import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateDto;
-import com.shalhlad.product_delivery_service.dto.request.ProductQuantityToChangeDto;
-import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithWarehouseDto;
-import com.shalhlad.product_delivery_service.mapper.DepartmentMapper;
+import com.shalhlad.product_delivery_service.dto.request.DepartmentCreateRequest;
+import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateRequest;
+import com.shalhlad.product_delivery_service.dto.request.EmployeeRoles;
+import com.shalhlad.product_delivery_service.dto.request.ProductQuantityChangeRequest;
+import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsResponse;
+import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithWarehouseResponse;
+import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
 import com.shalhlad.product_delivery_service.service.DepartmentService;
 import com.shalhlad.product_delivery_service.util.Utils;
 import io.swagger.annotations.ApiOperation;
-import java.security.Principal;
 import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -20,75 +21,78 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/departments")
+@RequiredArgsConstructor
 public class DepartmentController {
 
   private final DepartmentService service;
-  private final DepartmentMapper mapper;
 
-  @Autowired
-  public DepartmentController(DepartmentService service, DepartmentMapper mapper) {
-    this.service = service;
-    this.mapper = mapper;
-  }
-
-  @GetMapping("/{id}")
+  @GetMapping("/{departmentId}")
   @ApiOperation(value = "getDepartmentById", notes = "Returns department by id")
-  public DepartmentDetailsWithWarehouseDto getById(@PathVariable Long id) {
-    return mapper.toDetailsWithWarehouseDto(service.findById(id));
-  }
-
-  @GetMapping("/me")
-  @PreAuthorize("hasAnyRole({'COLLECTOR', 'COURIER', 'DEPARTMENT_HEAD'})")
-  @ApiOperation(value = "getDepartmentByAuthorization", notes = "Returns department of authorized employee")
-  public DepartmentDetailsWithWarehouseDto getByAuthorization(
-      @ApiIgnore Principal principal) {
-    return mapper.toDetailsWithWarehouseDto(service.findByPrincipal(principal));
+  public DepartmentDetailsResponse getById(@PathVariable Long departmentId) {
+    return service.findDepartmentById(departmentId);
   }
 
   @GetMapping
   @ApiOperation(value = "getAllDepartments", notes = "Returns all departments")
-  public Iterable<DepartmentDetailsWithWarehouseDto> getAll() {
-    return mapper.toDetailsWithWarehouseDto(service.findAll());
+  public Iterable<DepartmentDetailsResponse> getAll() {
+    return service.findAllDepartments();
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   @ApiOperation(value = "createDepartment", notes = "Creates department")
-  public DepartmentDetailsWithWarehouseDto create(
-      @RequestBody @Valid DepartmentCreationDto departmentCreationDto,
+  public DepartmentDetailsResponse create(
+      @RequestBody @Valid DepartmentCreateRequest departmentCreateRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return mapper.toDetailsWithWarehouseDto(service.create(departmentCreationDto));
+    return service.createDepartment(departmentCreateRequest);
   }
 
-  @PatchMapping("/{id}")
+  @PatchMapping("/{departmentId}")
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
-  @ApiOperation(value = "updateDepartment", notes = "Update department fields")
-  public DepartmentDetailsWithWarehouseDto update(
-      @PathVariable Long id,
-      @RequestBody @Valid DepartmentUpdateDto departmentUpdateDto,
+  @ApiOperation(value = "updateDepartmentById", notes = "Update department fields by departmentId")
+  public DepartmentDetailsResponse update(
+      @PathVariable Long departmentId,
+      @RequestBody @Valid DepartmentUpdateRequest departmentUpdateRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return mapper.toDetailsWithWarehouseDto(service.update(id, departmentUpdateDto));
+    return service.updateDepartmentDetails(departmentId, departmentUpdateRequest);
   }
 
-  @PatchMapping("/{id}/warehouse")
+  @GetMapping("/{departmentId}/warehouse")
+  @ApiOperation(value = "getDepartmentWithWarehouseByDepartmentId", notes = "Returns department with warehouse by departmentId")
+  public DepartmentDetailsWithWarehouseResponse getWithWarehouseById(
+      @PathVariable Long departmentId) {
+    return service.getDepartmentWithWarehouse(departmentId);
+  }
+
+  @PatchMapping("/{departmentId}/warehouse")
   @PreAuthorize("hasRole('WAREHOUSEMAN')")
-  @ApiOperation(value = "updateProductQuantityInWarehouse",
+  @ApiOperation(value = "updateProductQuantityInDepartmentWarehouseByDepartmentId",
       notes = "Updates quantity of products in department's warehouse by department id")
-  public DepartmentDetailsWithWarehouseDto changeProductQuantity(
-      @PathVariable Long id,
-      @RequestBody @Valid ProductQuantityToChangeDto productQuantityToChangeDto,
+  public DepartmentDetailsWithWarehouseResponse changeProductQuantity(
+      @PathVariable Long departmentId,
+      @RequestBody @Valid ProductQuantityChangeRequest productQuantityChangeRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return mapper.toDetailsWithWarehouseDto(
-        service.changeProductQuantity(id, productQuantityToChangeDto));
+    return service.changeProductQuantityInDepartment(departmentId, productQuantityChangeRequest);
   }
+
+  @GetMapping("/{departmentId}/employees")
+  @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
+  @ApiOperation(value = "getEmployeesOfDepartmentByDepartmentId", notes = "Returns employees of department by departmentId")
+  public Iterable<EmployeeDetailsResponse> getEmployeesOfDepartmentById(
+      @PathVariable Long departmentId,
+      @RequestParam(required = false) EmployeeRoles employeeRole) {
+    return service.findEmployeesOfDepartment(departmentId, employeeRole);
+  }
+
+
 }

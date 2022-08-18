@@ -1,7 +1,7 @@
 package com.shalhlad.product_delivery_service.mapper;
 
-import com.shalhlad.product_delivery_service.dto.response.OrderDetailsDto;
-import com.shalhlad.product_delivery_service.dto.response.ProductWithQuantityAndDiscountDto;
+import com.shalhlad.product_delivery_service.dto.response.OrderDetailsResponse;
+import com.shalhlad.product_delivery_service.dto.response.ProductWithQuantityAndDiscountResponse;
 import com.shalhlad.product_delivery_service.entity.order.Order;
 import com.shalhlad.product_delivery_service.entity.order.OrderedProductDetails;
 import com.shalhlad.product_delivery_service.entity.product.Product;
@@ -24,12 +24,12 @@ public abstract class OrderMapper {
       @Mapping(target = "orderedProducts", qualifiedByName = "orderedProductsMapToList"),
       @Mapping(target = "nextStage", expression = "java(calculateNextStage(order))")
   })
-  public abstract OrderDetailsDto toDetailsDto(Order order);
+  public abstract OrderDetailsResponse toDetailsResponse(Order order);
 
-  public abstract List<OrderDetailsDto> toDetailsDto(Iterable<Order> orders);
+  public abstract List<OrderDetailsResponse> toDetailsResponse(Iterable<Order> orders);
 
-  public Page<OrderDetailsDto> toDetailsDto(Page<Order> orders) {
-    List<OrderDetailsDto> mappedContent = toDetailsDto(orders.getContent());
+  public Page<OrderDetailsResponse> toDetailsResponse(Page<Order> orders) {
+    List<OrderDetailsResponse> mappedContent = toDetailsResponse(orders.getContent());
     return new PageImpl<>(mappedContent, orders.getPageable(), orders.getTotalElements());
   }
 
@@ -61,13 +61,13 @@ public abstract class OrderMapper {
   }
 
   @Named("orderedProductsMapToList")
-  protected List<ProductWithQuantityAndDiscountDto> orderedProductsMapToList(
+  protected List<ProductWithQuantityAndDiscountResponse> orderedProductsMapToList(
       Map<Product, OrderedProductDetails> orderedProducts) {
     return orderedProducts.entrySet().stream()
         .map(e -> {
           Product product = e.getKey();
           OrderedProductDetails productDetails = e.getValue();
-          return new ProductWithQuantityAndDiscountDto(
+          return new ProductWithQuantityAndDiscountResponse(
               product.getId(),
               product.getName(),
               product.getCategory(),

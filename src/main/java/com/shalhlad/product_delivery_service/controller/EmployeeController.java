@@ -1,17 +1,15 @@
 package com.shalhlad.product_delivery_service.controller;
 
-import com.shalhlad.product_delivery_service.dto.request.UserRecruitRequestDto;
-import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsDto;
-import com.shalhlad.product_delivery_service.dto.response.UserDetailsDto;
+import com.shalhlad.product_delivery_service.dto.request.UserRecruitRequest;
+import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.entity.user.Role;
-import com.shalhlad.product_delivery_service.mapper.EmployeeMapper;
-import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.service.EmployeeService;
 import com.shalhlad.product_delivery_service.util.Utils;
 import io.swagger.annotations.ApiOperation;
 import java.security.Principal;
 import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -21,88 +19,59 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
+@RequestMapping("/employees")
+@RequiredArgsConstructor
 public class EmployeeController {
 
   private final EmployeeService service;
-  private final EmployeeMapper employeeMapper;
-  private final UserMapper userMapper;
 
-  @Autowired
-  public EmployeeController(EmployeeService service, EmployeeMapper employeeMapper,
-      UserMapper userMapper) {
-    this.service = service;
-    this.employeeMapper = employeeMapper;
-    this.userMapper = userMapper;
-  }
-
-  @GetMapping("/departments/me/employees")
-  @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
-  @ApiOperation(value = "getEmployeesOfAuthorizedEmployeeDepartment",
-      notes = "Returns all employees of authorized employee department")
-  public Iterable<EmployeeDetailsDto> getEmployeesOfCurrentDepartment(
-      @ApiIgnore Principal principal) {
-    return employeeMapper.toDetailsDto(
-        service.findAllEmployeesOfAuthorizationDepartment(principal));
-  }
-
-  @GetMapping("/departments/{departmentId}/employees")
-  @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
-  @ApiOperation(value = "getEmployeesOfDepartmentByDepartmentId",
-      notes = "Returns all employees of department by department id")
-  public Iterable<EmployeeDetailsDto> getEmployeesOfDepartmentByDepartmentId(
-      @ApiIgnore Principal principal,
-      @PathVariable Long departmentId) {
-    return employeeMapper.toDetailsDto(
-        service.findAllEmployeesByDepartmentId(principal, departmentId));
-  }
-
-  @GetMapping("/employees//{userId}")
-  @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
-  @ApiOperation(value = "getEmployeeOfAuthorizedEmployeeDepartmentByEmployeeId",
-      notes = "Returns employee of authorized employee department by employee id")
-  public EmployeeDetailsDto getEmployeeOfCurrentDepartmentByUserId(
-      @ApiIgnore Principal principal,
-      @PathVariable String userId) {
-    return employeeMapper.toDetailsDto(
-        service.findEmployeeOfCurrentDepartmentByUserId(principal, userId));
-  }
-
-  @PostMapping("/employees")
+  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   @ApiOperation(value = "recruitUser",
       notes = "Makes customer the employee of authorized employee department")
-  public EmployeeDetailsDto recruitUser(
+  public EmployeeDetailsResponse recruitUser(
       @ApiIgnore Principal principal,
-      @RequestBody @Valid UserRecruitRequestDto userRecruitRequestDto,
+      @RequestBody @Valid UserRecruitRequest userRecruitRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return employeeMapper.toDetailsDto(service.recruit(principal, userRecruitRequestDto));
+    return service.recruitUser(principal, userRecruitRequest);
   }
 
-  @PatchMapping("/employees/{userId}")
+  @GetMapping("/{userId}")
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
-  @ApiOperation(value = "changeEmployeePosition",
+  @ApiOperation(value = "getEmployeeByUserId", notes = "Returns employee by userId")
+  public EmployeeDetailsResponse getEmployeeByUserId(
+      @ApiIgnore Principal principal,
+      @PathVariable String userId) {
+    return service.findEmployeeByUserId(principal, userId);
+  }
+
+  @PatchMapping("/{userId}")
+  @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
+  @ApiOperation(value = "changeEmployeePositionByUserId",
       notes = "Change employee position of authorized employee department")
-  public EmployeeDetailsDto changeEmployeePosition(
+  public EmployeeDetailsResponse changeEmployeePosition(
       @ApiIgnore Principal principal,
       @PathVariable String userId,
       @RequestParam Role position) {
-    return employeeMapper.toDetailsDto(service.changePosition(principal, userId, position));
+    return service.changeRoleOfEmployee(principal, userId, position);
   }
 
-  @DeleteMapping("/employees/{userId}")
+  @DeleteMapping("/{userId}")
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   @ApiOperation(value = "fireEmployeeByUserId",
       notes = "Fire employee of authorized employee department by userId")
-  public UserDetailsDto fireEmployee(@ApiIgnore Principal principal, @PathVariable String userId) {
-    return userMapper.toDetailsDto(service.fire(principal, userId));
+  public UserDetailsResponse fireEmployee(@ApiIgnore Principal principal,
+      @PathVariable String userId) {
+    return service.fireEmployeeByUserId(principal, userId);
   }
 
 

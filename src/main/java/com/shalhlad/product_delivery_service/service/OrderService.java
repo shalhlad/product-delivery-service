@@ -1,31 +1,16 @@
 package com.shalhlad.product_delivery_service.service;
 
-import com.shalhlad.product_delivery_service.dto.request.OrderCreationDto;
+import com.shalhlad.product_delivery_service.dto.request.OrderCreateRequest;
 import com.shalhlad.product_delivery_service.dto.request.OrderOperations;
-import com.shalhlad.product_delivery_service.entity.order.Order;
-import com.shalhlad.product_delivery_service.entity.order.Stage;
+import com.shalhlad.product_delivery_service.dto.response.OrderDetailsResponse;
 import java.security.Principal;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 public interface OrderService {
 
-  Order create(Principal principal, OrderCreationDto orderCreationDto);
+  OrderDetailsResponse createOrder(Principal principal, OrderCreateRequest orderCreateRequest);
 
-  Order findById(Long id);
+  OrderDetailsResponse findOrderById(Long id, Principal principal);
 
-  Page<Order> findAllByUserId(String userId, Pageable pageable);
-
-  Order applyOperation(Principal principal, Long orderId, OrderOperations operation);
-
-  Page<Order> findAllByDepartmentAndStage(Principal principal, Long departmentId, Stage stage,
-      Pageable pageable);
-
-  Page<Order> findAllByEmail(String email, Pageable pageable);
-
-  Iterable<Order> findAllInProcessingByPrincipal(Principal principal);
-
-  Iterable<Order> findActiveOrdersByEmail(String email);
-
-  Page<Order> findAllProcessableOrders(Principal principal, Pageable pageable);
+  OrderDetailsResponse applyOperationToOrder(Principal principal, Long orderId,
+      OrderOperations operation);
 }

@@ -1,18 +1,18 @@
 package com.shalhlad.product_delivery_service.service;
 
-import com.shalhlad.product_delivery_service.dto.request.ProductCreationDto;
-import com.shalhlad.product_delivery_service.dto.request.ProductUpdateDto;
+import com.shalhlad.product_delivery_service.dto.request.ProductCreateRequest;
+import com.shalhlad.product_delivery_service.dto.request.ProductUpdateRequest;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ProductService {
 
-  Page<Product> findAll(Long categoryId, Pageable pageable);
+  Page<Product> findAllProducts(Long categoryId, Pageable pageable);
 
-  Product create(ProductCreationDto productCreationDto);
+  Product createProduct(ProductCreateRequest productCreateRequest);
 
-  Product findById(Long id);
+  Product findProductById(Long id);
 
-  Product update(Long id, ProductUpdateDto productUpdateDto);
+  Product updateProductById(Long id, ProductUpdateRequest productUpdateRequest);
 }

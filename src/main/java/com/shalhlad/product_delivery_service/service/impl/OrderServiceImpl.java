@@ -1,7 +1,8 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
-import com.shalhlad.product_delivery_service.dto.request.OrderCreationDto;
+import com.shalhlad.product_delivery_service.dto.request.OrderCreateRequest;
 import com.shalhlad.product_delivery_service.dto.request.OrderOperations;
+import com.shalhlad.product_delivery_service.dto.response.OrderDetailsResponse;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.order.Order;
 import com.shalhlad.product_delivery_service.entity.order.OrderHandlers;
@@ -15,6 +16,7 @@ import com.shalhlad.product_delivery_service.entity.user.User;
 import com.shalhlad.product_delivery_service.exception.InvalidValueException;
 import com.shalhlad.product_delivery_service.exception.NoRightsException;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
+import com.shalhlad.product_delivery_service.mapper.OrderMapper;
 import com.shalhlad.product_delivery_service.repository.CardRepository;
 import com.shalhlad.product_delivery_service.repository.DepartmentRepository;
 import com.shalhlad.product_delivery_service.repository.EmployeeRepository;
@@ -29,13 +31,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
   private final OrderRepository orderRepository;
@@ -45,20 +46,7 @@ public class OrderServiceImpl implements OrderService {
   private final EmployeeRepository employeeRepository;
   private final OrderHandlersRepository orderHandlersRepository;
   private final CardRepository cardRepository;
-
-  @Autowired
-  public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository,
-      DepartmentRepository departmentRepository, ProductRepository productRepository,
-      EmployeeRepository employeeRepository, OrderHandlersRepository orderHandlersRepository,
-      CardRepository cardRepository) {
-    this.orderRepository = orderRepository;
-    this.userRepository = userRepository;
-    this.departmentRepository = departmentRepository;
-    this.productRepository = productRepository;
-    this.employeeRepository = employeeRepository;
-    this.orderHandlersRepository = orderHandlersRepository;
-    this.cardRepository = cardRepository;
-  }
+  private final OrderMapper orderMapper;
 
   private BigDecimal calculateDiscount(Integer numberOfOrders) {
     BigDecimal result;
@@ -79,11 +67,12 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Order create(Principal principal, OrderCreationDto orderCreationDto) {
+  public OrderDetailsResponse createOrder(Principal principal,
+      OrderCreateRequest orderCreateRequest) {
     String email = principal.getName();
-    Department department = departmentRepository.findById(orderCreationDto.getDepartmentId())
+    Department department = departmentRepository.findById(orderCreateRequest.getDepartmentId())
         .orElseThrow(() -> new NotFoundException(
-            "Department not found with id: " + orderCreationDto.getDepartmentId()));
+            "Department not found with id: " + orderCreateRequest.getDepartmentId()));
 
     User user = userRepository.findByEmail(email).orElseThrow();
     if (orderRepository.existsByUserAndStageNotAndStageNot(user, Stage.CANCELED, Stage.GIVEN)) {
@@ -94,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
 
     Map<Product, Integer> productWarehouse = department.getProductWarehouse();
     Map<Product, OrderedProductDetails> orderedProducts = new HashMap<>();
-    orderCreationDto.getOrderedProducts().forEach((productId, quantity) -> {
+    orderCreateRequest.getOrderedProducts().forEach((productId, quantity) -> {
       if (quantity <= 0) {
         throw new InvalidValueException("Quantity of product cannot be less or equal of 0");
       }
@@ -118,69 +107,40 @@ public class OrderServiceImpl implements OrderService {
 
     cardRepository.save(card);
 
-    return orderRepository.save(
+    Order saved = orderRepository.save(
         Order.builder()
             .user(user)
             .department(department)
-            .deliveryAddress(orderCreationDto.getDeliveryAddress())
+            .deliveryAddress(orderCreateRequest.getDeliveryAddress())
             .orderedProducts(orderedProducts)
             .orderHandlers(orderHandlersRepository.save(new OrderHandlers()))
             .stage(Stage.NEW)
             .stageHistory(Map.of(Stage.NEW, new Date()))
             .build()
     );
+    return orderMapper.toDetailsResponse(saved);
   }
 
   @Override
-  public Order findById(Long id) {
-    return orderRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("Order not found with id: " + id));
-  }
-
-  @Override
-  public Page<Order> findAllByUserId(String userId, Pageable pageable) {
-    User user = userRepository.findByUserId(userId)
-        .orElseThrow(() -> new NotFoundException("User not found with userId: " + userId));
-    return orderRepository.findAllByUser(user, pageable);
-  }
-
-  @Override
-  public Page<Order> findAllByEmail(String email, Pageable pageable) {
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
-    return orderRepository.findAllByUser(user, pageable);
-  }
-
-  @Override
-  public Iterable<Order> findAllInProcessingByPrincipal(Principal principal) {
-    Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
-    return orderRepository.findAllByOrderHandlersCurrentHandler(employee);
-  }
-
-  @Override
-  public Iterable<Order> findActiveOrdersByEmail(String email) {
-    User user = userRepository.findByEmail(email).orElseThrow();
-    return orderRepository.findAllByUserAndStageNotAndStageNot(user, Stage.GIVEN, Stage.CANCELED);
-  }
-
-  @Override
-  public Page<Order> findAllProcessableOrders(Principal principal, Pageable pageable) {
-    Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
-    Department department = employee.getDepartment();
-    Page<Order> page;
-    if (employee.getRole() == Role.ROLE_COLLECTOR) {
-      page = orderRepository.findAllByDepartmentAndStage(department, Stage.NEW, pageable);
-    } else if (employee.getRole() == Role.ROLE_COURIER) {
-      page = orderRepository.findAllByDepartmentAndStageNotAndOrderHandlersCourier(department,
-          Stage.CANCELED, employee, pageable);
-    } else {
-      throw new NoRightsException("Only collector and courier can handle orders");
+  public OrderDetailsResponse findOrderById(Long orderId, Principal principal) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new NotFoundException("Order not found with id: " + orderId));
+    User user = userRepository.findByEmail(principal.getName()).orElseThrow();
+    if (user.getRole().isEmployee()) {
+      Employee employee = employeeRepository.findById(user.getId()).orElseThrow();
+      if (!employee.getDepartment().equals(order.getDepartment())) {
+        throw new NoRightsException("Employee cannot get order of other departments");
+      }
+    } else if (user.getRole() != Role.ROLE_ADMIN && !order.getUser().equals(user)) {
+      throw new NoRightsException("Only admin can get info about another user orders");
     }
-    return page;
+
+    return orderMapper.toDetailsResponse(order);
   }
 
   @Override
-  public Order applyOperation(Principal principal, Long orderId, OrderOperations operation) {
+  public OrderDetailsResponse applyOperationToOrder(Principal principal, Long orderId,
+      OrderOperations operation) {
     User user = userRepository.findByEmail(principal.getName()).orElseThrow();
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new NotFoundException("Order not found with id: " + orderId));
@@ -244,9 +204,10 @@ public class OrderServiceImpl implements OrderService {
           throw new InvalidValueException(e.getMessage());
         }
 
-        if (order.getStage() == Stage.COLLECTED ||
-            order.getStage() == Stage.GIVEN) {
+        if (order.getStage() == Stage.GIVEN) {
           orderHandlers.setCurrentHandler(null);
+        } else if (order.getStage() == Stage.IN_DELIVERY) {
+          orderHandlers.setCurrentHandler(employee);
         }
 
         Map<Stage, Date> stageHistory = order.getStageHistory();
@@ -271,38 +232,25 @@ public class OrderServiceImpl implements OrderService {
         OrderHandlers orderHandlers = order.getOrderHandlers();
 
         if (userRole == Role.ROLE_COLLECTOR) {
-          if (currentStage != Stage.NEW) {
+          if (currentStage != Stage.APPROVED) {
             throw new InvalidValueException(
-                "Cannot handle order, because it canceled or already handled by another collector");
+                "Collector can start handle only approved orders");
           }
           orderHandlers.setCollector(employee);
+          orderHandlers.setCurrentHandler(employee);
         } else {
-          if (!currentStage.canBeChangedByCollector() && currentStage != Stage.COLLECTED) {
+          if (currentStage != Stage.NEW) {
             throw new InvalidValueException(
-                "Cannot handle order, because it canceled or already handled by another courier");
+                "Courier can start handle only new orders");
           }
           orderHandlers.setCourier(employee);
         }
-        orderHandlers.setCurrentHandler(employee);
       }
 
     }
 
-    return orderRepository.save(order);
+    Order saved = orderRepository.save(order);
+    return orderMapper.toDetailsResponse(saved);
   }
-
-  @Override
-  public Page<Order> findAllByDepartmentAndStage(Principal principal, Long departmentId,
-      Stage stage, Pageable pageable) {
-    Department department = departmentRepository.findById(departmentId)
-        .orElseThrow(() -> new NotFoundException("Department not found with id: " + departmentId));
-    Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
-    if (!employee.getDepartment().equals(department)) {
-      throw new NoRightsException(
-          "Cannot get orders of department because current user does not works in requested department");
-    }
-    return orderRepository.findAllByDepartmentAndStage(department, stage, pageable);
-  }
-
 
 }

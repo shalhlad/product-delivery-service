@@ -1,13 +1,13 @@
 package com.shalhlad.product_delivery_service.controller;
 
-import com.shalhlad.product_delivery_service.dto.request.CategoryCreationDto;
-import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateDto;
+import com.shalhlad.product_delivery_service.dto.request.CategoryCreateRequest;
+import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateRequest;
 import com.shalhlad.product_delivery_service.entity.product.Category;
 import com.shalhlad.product_delivery_service.service.CategoryService;
 import com.shalhlad.product_delivery_service.util.Utils;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -23,25 +23,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/categories")
+@RequiredArgsConstructor
 public class CategoryController {
 
   private final CategoryService service;
 
-  @Autowired
-  public CategoryController(CategoryService service) {
-    this.service = service;
-  }
-
   @GetMapping
   @ApiOperation(value = "getAllCategories", notes = "Returns all categories")
   public Iterable<Category> getAll() {
-    return service.findAll();
+    return service.findAllCategories();
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("/{categoryId}")
   @ApiOperation(value = "getCategoryById", notes = "Returns category by id")
-  public Category getById(@PathVariable Long id) {
-    return service.findById(id);
+  public Category getById(@PathVariable Long categoryId) {
+    return service.findCategoryById(categoryId);
   }
 
   @PostMapping
@@ -49,28 +45,28 @@ public class CategoryController {
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   @ApiOperation(value = "createCategory", notes = "Creates category")
   public Category create(
-      @RequestBody @Valid CategoryCreationDto categoryCreationDto,
+      @RequestBody @Valid CategoryCreateRequest categoryCreateRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return service.create(categoryCreationDto);
+    return service.createCategory(categoryCreateRequest);
   }
 
-  @PatchMapping("/{id}")
+  @PatchMapping("/{categoryId}")
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
-  @ApiOperation(value = "updateCategory", notes = "Updates category fields")
+  @ApiOperation(value = "updateCategoryById", notes = "Updates category fields")
   public Category update(
-      @PathVariable Long id,
-      @RequestBody @Valid CategoryUpdateDto categoryUpdateDto,
+      @PathVariable Long categoryId,
+      @RequestBody @Valid CategoryUpdateRequest categoryUpdateRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return service.update(id, categoryUpdateDto);
+    return service.updateCategoryById(categoryId, categoryUpdateRequest);
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/{categoryId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
-  @ApiOperation(value = "deleteCategory", notes = "Deletes category")
-  public void delete(@PathVariable Long id) {
-    service.deleteById(id);
+  @ApiOperation(value = "deleteCategoryById", notes = "Deletes category")
+  public void delete(@PathVariable Long categoryId) {
+    service.deleteCategoryById(categoryId);
   }
 }

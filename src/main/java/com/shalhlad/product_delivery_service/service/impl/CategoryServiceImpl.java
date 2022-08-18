@@ -1,7 +1,7 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
-import com.shalhlad.product_delivery_service.dto.request.CategoryCreationDto;
-import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateDto;
+import com.shalhlad.product_delivery_service.dto.request.CategoryCreateRequest;
+import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateRequest;
 import com.shalhlad.product_delivery_service.entity.product.Category;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
 import com.shalhlad.product_delivery_service.mapper.CategoryMapper;
@@ -25,36 +25,36 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public Category create(CategoryCreationDto categoryCreationDto) {
+  public Category createCategory(CategoryCreateRequest categoryCreateRequest) {
     Category category = new Category();
-    category.setName(categoryCreationDto.getName());
+    category.setName(categoryCreateRequest.getName());
     return categoryRepository.save(category);
   }
 
   @Override
-  public Iterable<Category> findAll() {
+  public Iterable<Category> findAllCategories() {
     return categoryRepository.findAll();
   }
 
   @Override
-  public Category findById(Long id) {
-    return categoryRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
+  public Category findCategoryById(Long categoryId) {
+    return categoryRepository.findById(categoryId)
+        .orElseThrow(() -> new NotFoundException("Category not found with id: " + categoryId));
   }
 
   @Override
-  public void deleteById(Long id) {
-    if (categoryRepository.existsById(id)) {
-      categoryRepository.deleteById(id);
+  public void deleteCategoryById(Long categoryId) {
+    if (categoryRepository.existsById(categoryId)) {
+      categoryRepository.deleteById(categoryId);
     } else {
-      throw new NotFoundException("Category not found with id " + id);
+      throw new NotFoundException("Category not found with id " + categoryId);
     }
   }
 
   @Override
-  public Category update(Long id, CategoryUpdateDto categoryUpdateDto) {
-    Category category = findById(id);
-    categoryMapper.update(category, categoryUpdateDto);
+  public Category updateCategoryById(Long categoryId, CategoryUpdateRequest categoryUpdateRequest) {
+    Category category = findCategoryById(categoryId);
+    categoryMapper.update(category, categoryUpdateRequest);
     return categoryRepository.save(category);
   }
 }

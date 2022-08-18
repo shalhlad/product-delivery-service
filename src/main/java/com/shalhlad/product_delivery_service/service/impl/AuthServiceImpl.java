@@ -1,12 +1,15 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
-import com.shalhlad.product_delivery_service.dto.request.SignUpDetailsDto;
-import com.shalhlad.product_delivery_service.dto.request.UserLoginDetailsDto;
+import com.shalhlad.product_delivery_service.dto.request.SignUpRequest;
+import com.shalhlad.product_delivery_service.dto.request.UserLoginRequest;
+import com.shalhlad.product_delivery_service.dto.response.AccessTokenResponse;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.entity.user.Card;
 import com.shalhlad.product_delivery_service.entity.user.Role;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import com.shalhlad.product_delivery_service.exception.InvalidLoginOrPasswordException;
 import com.shalhlad.product_delivery_service.exception.InvalidValueException;
+import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.repository.CardRepository;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.security.jwt.JwtProvider;
@@ -15,35 +18,27 @@ import com.shalhlad.product_delivery_service.util.Utils;
 import java.math.BigDecimal;
 import java.util.Date;
 import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
   private final UserRepository userRepository;
   private final CardRepository cardRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtProvider jwtProvider;
-
-  @Autowired
-  public AuthServiceImpl(UserRepository userRepository, CardRepository cardRepository,
-      PasswordEncoder passwordEncoder,
-      JwtProvider jwtProvider) {
-    this.userRepository = userRepository;
-    this.cardRepository = cardRepository;
-    this.passwordEncoder = passwordEncoder;
-    this.jwtProvider = jwtProvider;
-  }
+  private final UserMapper userMapper;
 
   @Override
-  public User signUp(SignUpDetailsDto signUpDetailsDto) {
+  public UserDetailsResponse signUp(SignUpRequest signUpRequest) {
     final int USER_ID_LENGTH = 15;
-    if (userRepository.existsByEmail(signUpDetailsDto.getEmail())) {
+    if (userRepository.existsByEmail(signUpRequest.getEmail())) {
       throw new InvalidValueException(
-          "User already exists with email: " + signUpDetailsDto.getEmail());
+          "User already exists with email: " + signUpRequest.getEmail());
     }
 
     Card card = new Card();
@@ -51,10 +46,10 @@ public class AuthServiceImpl implements AuthService {
     card.setNumberOfOrders(0);
 
     User user = new User();
-    user.setEmail(signUpDetailsDto.getEmail());
-    user.setEncryptedPassword(passwordEncoder.encode(signUpDetailsDto.getPassword()));
+    user.setEmail(signUpRequest.getEmail());
+    user.setEncryptedPassword(passwordEncoder.encode(signUpRequest.getPassword()));
     user.setRegistrationDate(new Date());
-    user.setFirstName(signUpDetailsDto.getFirstName());
+    user.setFirstName(signUpRequest.getFirstName());
     user.setRole(Role.ROLE_CUSTOMER);
     user.setCard(cardRepository.save(card));
 
@@ -64,17 +59,18 @@ public class AuthServiceImpl implements AuthService {
     } while (userRepository.existsByUserId(userId));
     user.setUserId(userId);
 
-    return userRepository.save(user);
+    User saved = userRepository.save(user);
+    return userMapper.toDetailsResponse(saved);
   }
 
   @Override
-  public String signIn(UserLoginDetailsDto userLoginDetailsDto) {
-    String email = userLoginDetailsDto.getEmail();
-    String password = userLoginDetailsDto.getPassword();
+  public AccessTokenResponse signIn(UserLoginRequest userLoginRequest) {
+    String email = userLoginRequest.getEmail();
+    String password = userLoginRequest.getPassword();
 
     User user = userRepository.findByEmail(email).orElse(null);
     if (user != null && passwordEncoder.matches(password, user.getEncryptedPassword())) {
-      return jwtProvider.generateToken(email);
+      return AccessTokenResponse.of(jwtProvider.generateToken(email));
     } else {
       throw new InvalidLoginOrPasswordException("Invalid email or password");
     }

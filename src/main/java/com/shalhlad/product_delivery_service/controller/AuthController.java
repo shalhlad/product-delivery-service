@@ -1,14 +1,14 @@
 package com.shalhlad.product_delivery_service.controller;
 
-import com.shalhlad.product_delivery_service.dto.request.SignUpDetailsDto;
-import com.shalhlad.product_delivery_service.dto.request.UserLoginDetailsDto;
+import com.shalhlad.product_delivery_service.dto.request.SignUpRequest;
+import com.shalhlad.product_delivery_service.dto.request.UserLoginRequest;
 import com.shalhlad.product_delivery_service.dto.response.AccessTokenResponse;
-import com.shalhlad.product_delivery_service.dto.response.UserDetailsDto;
-import com.shalhlad.product_delivery_service.mapper.UserMapper;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.service.AuthService;
 import com.shalhlad.product_delivery_service.util.Utils;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,33 +19,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
   private final AuthService service;
-  private final UserMapper mapper;
-
-  public AuthController(AuthService service, UserMapper mapper) {
-    this.service = service;
-    this.mapper = mapper;
-  }
 
   @PostMapping("/sign-up")
   @ResponseStatus(HttpStatus.CREATED)
-  @ApiOperation(value = "signUp", notes = "Sign up as new user")
-  public UserDetailsDto signUp(
-      @RequestBody @Valid SignUpDetailsDto signUpDetailsDto,
+  @ApiOperation(value = "signUp", notes = "Sign up user")
+  public UserDetailsResponse signUp(
+      @RequestBody @Valid SignUpRequest signUpRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return mapper.toDetailsDto(service.signUp(signUpDetailsDto));
+    return service.signUp(signUpRequest);
   }
 
   @PostMapping("/sign-in")
-  @ApiOperation(value = "signIn", notes = "Sign in by existing user")
+  @ApiOperation(value = "signIn", notes = "Returns auth token")
   public AccessTokenResponse signIn(
-      @RequestBody @Valid UserLoginDetailsDto userLoginDetailsDto,
+      @RequestBody @Valid UserLoginRequest userLoginRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
-    return AccessTokenResponse.of(service.signIn(userLoginDetailsDto));
+    return service.signIn(userLoginRequest);
   }
 
 }

@@ -1,12 +1,14 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
+import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.service.UserService;
 import java.util.Collections;
 import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,30 +17,24 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
-  @Autowired
-  public UserServiceImpl(UserRepository userRepository) {
-    this.userRepository = userRepository;
+  @Override
+  public Page<UserDetailsResponse> findAllUsers(Pageable pageable) {
+    Page<User> users = userRepository.findAll(pageable);
+    return userMapper.toDetailsResponse(users);
   }
 
   @Override
-  public Page<User> findAll(Pageable pageable) {
-    return userRepository.findAll(pageable);
-  }
-
-  @Override
-  public User findByUserId(String userId) {
-    return userRepository.findByUserId(userId).orElseThrow(() ->
-        new NotFoundException("User not found with userId: " + userId));
-  }
-
-  @Override
-  public User findByEmail(String email) {
-    return userRepository.findByEmail(email).orElseThrow(() ->
-        new NotFoundException("User not found with email: " + email));
+  public UserDetailsResponse findUserByUserId(String userId) {
+    return userRepository.findByUserId(userId)
+        .map(userMapper::toDetailsResponse)
+        .orElseThrow(() ->
+            new NotFoundException("User not found with userId: " + userId));
   }
 
   @Override

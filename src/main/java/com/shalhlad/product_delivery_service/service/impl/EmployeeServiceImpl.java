@@ -1,6 +1,8 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
-import com.shalhlad.product_delivery_service.dto.request.UserRecruitRequestDto;
+import com.shalhlad.product_delivery_service.dto.request.UserRecruitRequest;
+import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.user.Employee;
 import com.shalhlad.product_delivery_service.entity.user.Role;
@@ -16,11 +18,12 @@ import com.shalhlad.product_delivery_service.repository.UserRepository;
 import com.shalhlad.product_delivery_service.service.EmployeeService;
 import java.security.Principal;
 import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
   private final UserRepository userRepository;
@@ -29,64 +32,31 @@ public class EmployeeServiceImpl implements EmployeeService {
   private final EmployeeMapper employeeMapper;
   private final UserMapper userMapper;
 
-  @Autowired
-  public EmployeeServiceImpl(UserRepository userRepository,
-      DepartmentRepository departmentRepository, EmployeeRepository employeeRepository,
-      EmployeeMapper employeeMapper, UserMapper userMapper) {
-    this.userRepository = userRepository;
-    this.departmentRepository = departmentRepository;
-    this.employeeRepository = employeeRepository;
-    this.employeeMapper = employeeMapper;
-    this.userMapper = userMapper;
+  @Override
+  public EmployeeDetailsResponse findEmployeeByUserId(Principal principal, String userId) {
+    return employeeRepository.findByUserId(userId)
+        .map(employeeMapper::toDetailsResponse)
+        .orElseThrow(() -> new NotFoundException("Employee not found by userId: " + userId));
   }
 
   @Override
-  public Iterable<Employee> findAllEmployeesOfAuthorizationDepartment(Principal principal) {
-    Employee manager = employeeRepository.findByEmail(principal.getName()).orElseThrow();
-    return employeeRepository.findAllByDepartment(manager.getDepartment());
-  }
-
-  @Override
-  public Iterable<Employee> findAllEmployeesByDepartmentId(Principal principal, Long departmentId) {
-    User user = userRepository.findByEmail(principal.getName()).orElseThrow();
-    Department department = departmentRepository.findById(departmentId)
-        .orElseThrow(() -> new NotFoundException("Department not found with id " + departmentId));
-
-    if (user.getRole() == Role.ROLE_DEPARTMENT_HEAD) {
-      Employee employee = employeeRepository.findById(user.getId()).orElseThrow();
-      if (!employee.getDepartment().equals(department)) {
-        throw new NoRightsException("Department head can get employees only of his department");
-      }
-    }
-
-    return employeeRepository.findAllByDepartment(department);
-  }
-
-  @Override
-  public Employee findEmployeeOfCurrentDepartmentByUserId(Principal principal, String userId) {
-    Employee manager = employeeRepository.findByEmail(principal.getName()).orElseThrow();
-    return employeeRepository.findByDepartmentAndUserId(manager.getDepartment(), userId)
+  public EmployeeDetailsResponse recruitUser(Principal principal,
+      UserRecruitRequest userRecruitRequest) {
+    Department department = departmentRepository.findById(userRecruitRequest.getDepartmentId())
         .orElseThrow(() -> new NotFoundException(
-            "Employee not found with current department and userId: " + userId));
-  }
-
-  @Override
-  public Employee recruit(Principal principal, UserRecruitRequestDto userRecruitRequestDto) {
-    Department department = departmentRepository.findById(userRecruitRequestDto.getDepartmentId())
-        .orElseThrow(() -> new NotFoundException(
-            "Department not found with id: " + userRecruitRequestDto.getDepartmentId()));
+            "Department not found with id: " + userRecruitRequest.getDepartmentId()));
 
     User principalUser = userRepository.findByEmail(principal.getName()).orElseThrow();
     switch (principalUser.getRole()) {
       case ROLE_ADMIN -> {
-        if (userRecruitRequestDto.getRole() != Role.ROLE_DEPARTMENT_HEAD) {
+        if (userRecruitRequest.getRole() != Role.ROLE_DEPARTMENT_HEAD) {
           throw new NoRightsException("Admin can only recruit department head");
         }
       }
       case ROLE_DEPARTMENT_HEAD -> {
-        if (userRecruitRequestDto.getRole() != Role.ROLE_WAREHOUSEMAN &&
-            userRecruitRequestDto.getRole() != Role.ROLE_COLLECTOR &&
-            userRecruitRequestDto.getRole() != Role.ROLE_COURIER) {
+        if (userRecruitRequest.getRole() != Role.ROLE_WAREHOUSEMAN &&
+            userRecruitRequest.getRole() != Role.ROLE_COLLECTOR &&
+            userRecruitRequest.getRole() != Role.ROLE_COURIER) {
           throw new NoRightsException(
               "Department head can only recruit warehouseman, collector or courier");
         }
@@ -100,23 +70,25 @@ public class EmployeeServiceImpl implements EmployeeService {
       default -> throw new NoRightsException("Only admin or department head can recruit employees");
     }
 
-    User targetUser = userRepository.findByUserId(userRecruitRequestDto.getUserId())
+    User targetUser = userRepository.findByUserId(userRecruitRequest.getUserId())
         .orElseThrow(() -> new NotFoundException(
-            "User not found with userId: " + userRecruitRequestDto.getUserId()));
+            "User not found with userId: " + userRecruitRequest.getUserId()));
     if (targetUser.getRole() != Role.ROLE_CUSTOMER) {
       throw new NoRightsException("Only customer can become employee");
     }
 
     Employee recruited = userMapper.toEmployee(targetUser);
     recruited.setDepartment(department);
-    recruited.setRole(userRecruitRequestDto.getRole());
+    recruited.setRole(userRecruitRequest.getRole());
 
     userRepository.delete(targetUser);
-    return employeeRepository.save(recruited);
+
+    Employee saved = employeeRepository.save(recruited);
+    return employeeMapper.toDetailsResponse(saved);
   }
 
   @Override
-  public User fire(Principal principal, String userId) {
+  public UserDetailsResponse fireEmployeeByUserId(Principal principal, String userId) {
     User principalUser = userRepository.findByEmail(principal.getName()).orElseThrow();
 
     Employee target = employeeRepository.findByUserId(userId)
@@ -148,11 +120,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     User user = employeeMapper.toUser(target);
     user.setRole(Role.ROLE_CUSTOMER);
     employeeRepository.delete(target);
-    return userRepository.save(user);
+
+    User saved = userRepository.save(user);
+    return userMapper.toDetailsResponse(saved);
   }
 
   @Override
-  public Employee changePosition(Principal principal, String userId, Role role) {
+  public EmployeeDetailsResponse changeRoleOfEmployee(Principal principal, String userId,
+      Role role) {
     if (role != Role.ROLE_COURIER &&
         role != Role.ROLE_COLLECTOR &&
         role != Role.ROLE_WAREHOUSEMAN) {
@@ -172,7 +147,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     target.setRole(role);
-    return employeeRepository.save(target);
+
+    Employee saved = employeeRepository.save(target);
+    return employeeMapper.toDetailsResponse(saved);
   }
 
 

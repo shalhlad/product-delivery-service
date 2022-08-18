@@ -1,13 +1,14 @@
 package com.shalhlad.product_delivery_service.service;
 
-import com.shalhlad.product_delivery_service.dto.request.SignUpDetailsDto;
-import com.shalhlad.product_delivery_service.dto.request.UserLoginDetailsDto;
-import com.shalhlad.product_delivery_service.entity.user.User;
+import com.shalhlad.product_delivery_service.dto.request.SignUpRequest;
+import com.shalhlad.product_delivery_service.dto.request.UserLoginRequest;
+import com.shalhlad.product_delivery_service.dto.response.AccessTokenResponse;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 
 public interface AuthService {
 
-  User signUp(SignUpDetailsDto signUpDetailsDto);
+  UserDetailsResponse signUp(SignUpRequest signUpRequest);
 
-  String signIn(UserLoginDetailsDto userLoginDetailsDto);
+  AccessTokenResponse signIn(UserLoginRequest userLoginRequest);
 
 }

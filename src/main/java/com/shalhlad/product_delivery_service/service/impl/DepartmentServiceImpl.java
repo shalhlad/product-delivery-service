@@ -1,80 +1,82 @@
 package com.shalhlad.product_delivery_service.service.impl;
 
-import com.shalhlad.product_delivery_service.dto.request.DepartmentCreationDto;
-import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateDto;
-import com.shalhlad.product_delivery_service.dto.request.ProductQuantityToChangeDto;
+import com.shalhlad.product_delivery_service.dto.request.DepartmentCreateRequest;
+import com.shalhlad.product_delivery_service.dto.request.DepartmentUpdateRequest;
+import com.shalhlad.product_delivery_service.dto.request.EmployeeRoles;
+import com.shalhlad.product_delivery_service.dto.request.ProductQuantityChangeRequest;
+import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsResponse;
+import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithWarehouseResponse;
+import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
 import com.shalhlad.product_delivery_service.entity.department.Department;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import com.shalhlad.product_delivery_service.entity.user.Employee;
 import com.shalhlad.product_delivery_service.exception.InvalidValueException;
 import com.shalhlad.product_delivery_service.exception.NotFoundException;
 import com.shalhlad.product_delivery_service.mapper.DepartmentMapper;
+import com.shalhlad.product_delivery_service.mapper.EmployeeMapper;
 import com.shalhlad.product_delivery_service.repository.DepartmentRepository;
 import com.shalhlad.product_delivery_service.repository.EmployeeRepository;
 import com.shalhlad.product_delivery_service.repository.ProductRepository;
 import com.shalhlad.product_delivery_service.service.DepartmentService;
-import java.security.Principal;
 import java.util.Map;
 import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class DepartmentServiceImpl implements DepartmentService {
 
   private final DepartmentRepository departmentRepository;
   private final ProductRepository productRepository;
   private final EmployeeRepository employeeRepository;
   private final DepartmentMapper departmentMapper;
-
-  @Autowired
-  public DepartmentServiceImpl(DepartmentRepository departmentRepository,
-      ProductRepository productRepository, EmployeeRepository employeeRepository,
-      DepartmentMapper departmentMapper) {
-    this.departmentRepository = departmentRepository;
-    this.productRepository = productRepository;
-    this.employeeRepository = employeeRepository;
-    this.departmentMapper = departmentMapper;
-  }
+  private final EmployeeMapper employeeMapper;
 
   @Override
-  public Department create(DepartmentCreationDto departmentCreationDto) {
+  public DepartmentDetailsResponse createDepartment(
+      DepartmentCreateRequest departmentCreateRequest) {
     Department department = new Department();
-    department.setAddress(departmentCreationDto.getAddress());
-    return departmentRepository.save(department);
+    department.setAddress(departmentCreateRequest.getAddress());
+
+    Department saved = departmentRepository.save(department);
+    return departmentMapper.toDetailsResponse(saved);
   }
 
   @Override
-  public Department findById(Long id) {
+  public DepartmentDetailsResponse findDepartmentById(Long id) {
     return departmentRepository.findById(id)
+        .map(departmentMapper::toDetailsResponse)
         .orElseThrow(() -> new NotFoundException("Department not found with id: " + id));
   }
 
   @Override
-  public Iterable<Department> findAll() {
-    return departmentRepository.findAll();
+  public Iterable<DepartmentDetailsResponse> findAllDepartments() {
+    Iterable<Department> departments = departmentRepository.findAll();
+    return departmentMapper.toDetailsResponse(departments);
   }
 
   @Override
-  public Department changeProductQuantity(Long departmentId,
-      ProductQuantityToChangeDto productQuantityToChangeDto) {
-    Department department = findById(departmentId);
+  public DepartmentDetailsWithWarehouseResponse changeProductQuantityInDepartment(Long departmentId,
+      ProductQuantityChangeRequest productQuantityChangeRequest) {
+    Department department = departmentRepository.findById(departmentId)
+        .orElseThrow(() -> new NotFoundException("Department not found with id: " + departmentId));
 
-    Product product = productRepository.findById(productQuantityToChangeDto.getProductId())
+    Product product = productRepository.findById(productQuantityChangeRequest.getProductId())
         .orElseThrow(() -> new NotFoundException(
-            "Product not found with id: " + productQuantityToChangeDto.getProductId()));
+            "Product not found with id: " + productQuantityChangeRequest.getProductId()));
 
     Map<Product, Integer> warehouse = department.getProductWarehouse();
 
-    switch (productQuantityToChangeDto.getAction()) {
+    switch (productQuantityChangeRequest.getAction()) {
       case "increase" -> warehouse.put(product,
-          warehouse.getOrDefault(product, 0) + productQuantityToChangeDto.getNumberOfProducts());
+          warehouse.getOrDefault(product, 0) + productQuantityChangeRequest.getNumberOfProducts());
       case "reduce" -> {
         if (warehouse.containsKey(product)
-            && warehouse.get(product) >= productQuantityToChangeDto.getNumberOfProducts()) {
+            && warehouse.get(product) >= productQuantityChangeRequest.getNumberOfProducts()) {
           warehouse.put(product,
-              warehouse.get(product) - productQuantityToChangeDto.getNumberOfProducts());
+              warehouse.get(product) - productQuantityChangeRequest.getNumberOfProducts());
         } else {
           throw new InvalidValueException(
               "Cannot reduce the quantity of products because the quantity to reduce more products in warehouse");
@@ -82,19 +84,36 @@ public class DepartmentServiceImpl implements DepartmentService {
       }
     }
 
-    return departmentRepository.save(department);
+    Department saved = departmentRepository.save(department);
+    return departmentMapper.toDetailsWithWarehouseResponse(saved);
   }
 
   @Override
-  public Department findByPrincipal(Principal principal) {
-    Employee employee = employeeRepository.findByEmail(principal.getName()).orElseThrow();
-    return employee.getDepartment();
+  public DepartmentDetailsWithWarehouseResponse getDepartmentWithWarehouse(Long id) {
+    return departmentRepository.findById(id)
+        .map(departmentMapper::toDetailsWithWarehouseResponse)
+        .orElseThrow(() -> new NotFoundException("Department not found with id: " + id));
   }
 
   @Override
-  public Department update(Long id, DepartmentUpdateDto departmentUpdateDto) {
-    Department department = findById(id);
-    departmentMapper.update(department, departmentUpdateDto);
-    return departmentRepository.save(department);
+  public DepartmentDetailsResponse updateDepartmentDetails(Long id,
+      DepartmentUpdateRequest departmentUpdateRequest) {
+    Department department = departmentRepository.findById(id)
+        .orElseThrow(() -> new NotFoundException("Department not found with id: " + id));
+    departmentMapper.update(department, departmentUpdateRequest);
+
+    Department saved = departmentRepository.save(department);
+    return departmentMapper.toDetailsResponse(saved);
+  }
+
+  @Override
+  public Iterable<EmployeeDetailsResponse> findEmployeesOfDepartment(Long id,
+      EmployeeRoles employeeRole) {
+    Department department = departmentRepository.findById(id)
+        .orElseThrow(() -> new NotFoundException("Department not found with id: " + id));
+    Iterable<Employee> employees = employeeRole == null ?
+        employeeRepository.findAllByDepartment(department) :
+        employeeRepository.findAllByDepartmentAndRole(department, employeeRole.toEntityRole());
+    return employeeMapper.toDetailsResponse(employees);
   }
 }

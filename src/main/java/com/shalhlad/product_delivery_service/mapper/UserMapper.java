@@ -2,8 +2,8 @@ package com.shalhlad.product_delivery_service.mapper;
 
 import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
-import com.shalhlad.product_delivery_service.dto.request.UserDetailsUpdateDto;
-import com.shalhlad.product_delivery_service.dto.response.UserDetailsDto;
+import com.shalhlad.product_delivery_service.dto.request.UserDetailsUpdateRequest;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.entity.user.Employee;
 import com.shalhlad.product_delivery_service.entity.user.User;
 import java.util.List;
@@ -17,12 +17,12 @@ import org.springframework.data.domain.PageImpl;
 @Mapper
 public abstract class UserMapper {
 
-  public abstract UserDetailsDto toDetailsDto(User user);
+  public abstract UserDetailsResponse toDetailsResponse(User user);
 
-  public abstract List<UserDetailsDto> toDetailsDto(Iterable<User> users);
+  public abstract List<UserDetailsResponse> toDetailsResponse(Iterable<User> users);
 
-  public Page<UserDetailsDto> toDetailsDto(Page<User> users) {
-    List<UserDetailsDto> mappedContent = toDetailsDto(users.getContent());
+  public Page<UserDetailsResponse> toDetailsResponse(Page<User> users) {
+    List<UserDetailsResponse> mappedContent = toDetailsResponse(users.getContent());
     return new PageImpl<>(mappedContent, users.getPageable(), users.getTotalElements());
   }
 
@@ -41,5 +41,6 @@ public abstract class UserMapper {
       @Mapping(target = "patronymic", nullValuePropertyMappingStrategy = IGNORE),
       @Mapping(target = "card", ignore = true)
   })
-  public abstract void update(@MappingTarget User user, UserDetailsUpdateDto userDetailsUpdateDto);
+  public abstract void update(@MappingTarget User user,
+      UserDetailsUpdateRequest userDetailsUpdateRequest);
 }

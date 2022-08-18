@@ -1,15 +1,15 @@
 package com.shalhlad.product_delivery_service.service;
 
-import com.shalhlad.product_delivery_service.entity.user.User;
+import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 
 public interface DbEditorService {
 
-  Iterable<User> findAll();
+  Iterable<UserDetailsResponse> findAllDbEditors();
 
-  User findByUserId(String userId);
+  UserDetailsResponse findDbEditorByUserId(String userId);
 
-  User add(String userId);
+  UserDetailsResponse addDbEditor(String userId);
 
-  User remove(String userId);
+  UserDetailsResponse removeDbEditor(String userId);
 
 }

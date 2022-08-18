@@ -1,7 +1,7 @@
 package com.shalhlad.product_delivery_service.security.exception_handling;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.shalhlad.product_delivery_service.exception.handling.ErrorResponse;
+import com.shalhlad.product_delivery_service.dto.response.ErrorResponse;
 import java.io.IOException;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
