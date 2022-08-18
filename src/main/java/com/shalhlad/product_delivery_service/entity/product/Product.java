@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -17,17 +18,19 @@ import org.hibernate.Hibernate;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Entity(name = "products")
+@Entity
+@Table(name = "products")
 public class Product {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
   private Long id;
 
-  @Column(unique = true, nullable = false, length = 50)
+  @Column(name = "name", unique = true, nullable = false, length = 50)
   private String name;
 
-  @Column(precision = 5, scale = 2, nullable = false)
+  @Column(name = "price", precision = 5, scale = 2, nullable = false)
   private BigDecimal price;
 
   @ManyToOne

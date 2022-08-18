@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -15,16 +16,17 @@ import lombok.ToString;
 @Setter
 @ToString
 @RequiredArgsConstructor
-@Entity(name = "cards")
+@Entity
+@Table(name = "cards")
 public class Card {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(name = "number_of_orders", nullable = false)
   private Integer numberOfOrders;
 
-  @Column(precision = 2, scale = 1, nullable = false)
+  @Column(name = "discount_in_percents", precision = 2, scale = 1, nullable = false)
   private BigDecimal discountInPercents;
 }

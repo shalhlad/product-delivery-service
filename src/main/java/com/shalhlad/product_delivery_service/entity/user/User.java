@@ -14,6 +14,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -22,41 +23,43 @@ import org.hibernate.Hibernate;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Entity(name = "users")
+@Entity
+@Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
   private Long id;
 
-  @Column(unique = true, nullable = false, length = 50)
+  @Column(name = "user_id", unique = true, nullable = false, length = 50)
   private String userId;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "card_id", referencedColumnName = "id", nullable = false)
   private Card card;
 
-  @Column(nullable = false, length = 50)
+  @Column(name = "first_name", nullable = false, length = 50)
   private String firstName;
 
-  @Column(length = 50)
+  @Column(name = "last_name", length = 50)
   private String lastName;
 
-  @Column(length = 50)
+  @Column(name = "patronymic", length = 50)
   private String patronymic;
 
-  @Column(unique = true, nullable = false, length = 50)
+  @Column(name = "email", unique = true, nullable = false, length = 50)
   private String email;
 
-  @Column(nullable = false, length = 100)
+  @Column(name = "encrypted_password", nullable = false, length = 100)
   private String encryptedPassword;
 
-  @Column(nullable = false)
+  @Column(name = "registration_date", nullable = false)
   private Date registrationDate;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 20)
+  @Column(name = "role", nullable = false, length = 20)
   private Role role;
 
   @Override

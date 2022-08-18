@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -13,7 +14,8 @@ import org.hibernate.Hibernate;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Entity(name = "employees")
+@Entity
+@Table(name = "employees")
 public class Employee extends User {
 
   @ManyToOne

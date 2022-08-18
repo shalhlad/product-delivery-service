@@ -12,7 +12,7 @@ public class UserDetailsUpdateRequest {
   @Length(min = 2, max = 50, message = "LastName should be between 2 and 50 characters long")
   private String lastName;
 
-  @Length(min = 2, max = 50, message = "PatronymicName should be between 2 and 50 characters long")
+  @Length(min = 2, max = 50, message = "Patronymic should be between 2 and 50 characters long")
   private String patronymic;
 
 }

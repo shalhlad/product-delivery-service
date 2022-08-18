@@ -22,6 +22,7 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.MapKeyEnumerated;
 import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,18 +35,20 @@ import org.hibernate.Hibernate;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "orders")
+@Entity
+@Table(name = "orders")
 public class Order {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
   private Long id;
 
   @ManyToOne
   @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
   private Department department;
 
-  @Column(nullable = false, length = 50)
+  @Column(name = "delivery_address", nullable = false, length = 50)
   private String deliveryAddress;
 
   @OneToOne(cascade = CascadeType.ALL)
@@ -65,7 +68,7 @@ public class Order {
   private User user;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(name = "stage", nullable = false)
   private Stage stage;
 
   @ElementCollection

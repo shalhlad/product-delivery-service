@@ -15,13 +15,13 @@ import lombok.Setter;
 @Embeddable
 public class OrderedProductDetails {
 
-  @Column(precision = 5, scale = 2, nullable = false)
+  @Column(name = "price_of_one", precision = 5, scale = 2, nullable = false)
   private BigDecimal priceOfOne;
 
-  @Column(nullable = false)
+  @Column(name = "quantity", nullable = false)
   private Integer quantity;
 
-  @Column(precision = 2, scale = 1, nullable = false)
+  @Column(name = "discount_in_percents", precision = 2, scale = 1, nullable = false)
   private BigDecimal discountInPercents;
 
 }
