@@ -26,5 +26,7 @@ public interface OrderRepository extends PagingAndSortingRepository<Order, Long>
 
   Page<Order> findAllByDepartmentAndStage(Department department, Stage stage, Pageable pageable);
 
+  Page<Order> findAllByUserAndStageNotAndStageNot(User user, Stage first, Stage second, Pageable pageable);
+
 
 }

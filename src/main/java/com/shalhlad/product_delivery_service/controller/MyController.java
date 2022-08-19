@@ -61,9 +61,10 @@ public class MyController {
   @ApiOperation(value = "getOrdersOfAuthorizedUser", notes = "Returns orders created by authorized user")
   public Page<OrderDetailsResponse> getOrdersOfAuthorizedUser(
       @ApiIgnore Principal principal,
+      @RequestParam(required = false, defaultValue = "false") boolean active,
       @RequestParam(required = false, defaultValue = "0") int page,
       @RequestParam(required = false, defaultValue = "15") int size) {
-    return service.getOrdersOfAuthorizedUser(principal, PageRequest.of(page, size));
+    return service.getOrdersOfAuthorizedUser(principal, active, PageRequest.of(page, size));
   }
 
   @GetMapping(value = "/orders/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)

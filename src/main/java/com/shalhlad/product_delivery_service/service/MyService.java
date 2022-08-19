@@ -23,7 +23,7 @@ public interface MyService {
   Page<OrderDetailsResponse> getOrdersOfAuthorizedUserDepartment(Principal principal,
       ProcessingOrderCharacteristics processingOrderCharacteristics, Pageable pageable);
 
-  Page<OrderDetailsResponse> getOrdersOfAuthorizedUser(Principal principal, Pageable pageable);
+  Page<OrderDetailsResponse> getOrdersOfAuthorizedUser(Principal principal, boolean active, Pageable pageable);
 
   OrderDetailsResponse getOrderOfAuthorizedUserByOrderId(Principal principal, Long orderId);
 

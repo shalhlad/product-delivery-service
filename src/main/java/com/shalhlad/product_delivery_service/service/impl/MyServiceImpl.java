@@ -102,11 +102,14 @@ public class MyServiceImpl implements MyService {
   }
 
   @Override
-  public Page<OrderDetailsResponse> getOrdersOfAuthorizedUser(Principal principal,
+  public Page<OrderDetailsResponse> getOrdersOfAuthorizedUser(Principal principal, boolean active,
       Pageable pageable) {
     User user = userRepository.findByEmail(principal.getName()).orElseThrow();
 
-    Page<Order> orders = orderRepository.findAllByUser(user, pageable);
+    Page<Order> orders = active ?
+        orderRepository.findAllByUserAndStageNotAndStageNot(user, Stage.GIVEN, Stage.CANCELED,
+            pageable) :
+        orderRepository.findAllByUser(user, pageable);
     return orderMapper.toDetailsResponse(orders);
   }
 
