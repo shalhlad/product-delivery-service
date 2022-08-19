@@ -5,8 +5,9 @@ import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateRequest;
 import com.shalhlad.product_delivery_service.entity.product.Category;
 import com.shalhlad.product_delivery_service.service.CategoryService;
 import com.shalhlad.product_delivery_service.util.Utils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,21 +25,21 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/${apiPrefix}/categories")
 @RequiredArgsConstructor
-@Api(tags = "categories")
+@Tag(name = "categories")
 public class CategoryController {
 
   private final CategoryService service;
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getAllCategories", notes = "Returns all categories")
+  @Operation(summary = "getAllCategories", description = "Returns all categories")
   public Iterable<Category> getAll() {
     return service.findAllCategories();
   }
 
   @GetMapping(value = "/{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getCategoryById", notes = "Returns category by id")
+  @Operation(summary = "getCategoryById", description = "Returns category by id")
   public Category getById(@PathVariable Long categoryId) {
     return service.findCategoryById(categoryId);
   }
@@ -48,7 +49,8 @@ public class CategoryController {
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
-  @ApiOperation(value = "createCategory", notes = "Creates category")
+  @Operation(summary = "createCategory", description = "Creates category")
+  @SecurityRequirement(name = "Bearer Authentication")
   public Category create(
       @RequestBody @Valid CategoryCreateRequest categoryCreateRequest,
       BindingResult bindingResult) {
@@ -60,7 +62,8 @@ public class CategoryController {
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
-  @ApiOperation(value = "updateCategoryById", notes = "Updates category fields")
+  @Operation(summary = "updateCategoryById", description = "Updates category fields")
+  @SecurityRequirement(name = "Bearer Authentication")
   public Category update(
       @PathVariable Long categoryId,
       @RequestBody @Valid CategoryUpdateRequest categoryUpdateRequest,
@@ -72,7 +75,8 @@ public class CategoryController {
   @DeleteMapping("/{categoryId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
-  @ApiOperation(value = "deleteCategoryById", notes = "Deletes category")
+  @Operation(summary = "deleteCategoryById", description = "Deletes category")
+  @SecurityRequirement(name = "Bearer Authentication")
   public void delete(@PathVariable Long categoryId) {
     service.deleteCategoryById(categoryId);
   }

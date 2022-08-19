@@ -5,8 +5,9 @@ import com.shalhlad.product_delivery_service.dto.request.ProductUpdateRequest;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import com.shalhlad.product_delivery_service.service.ProductService;
 import com.shalhlad.product_delivery_service.util.Utils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,15 +27,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/${apiPrefix}/products")
 @RequiredArgsConstructor
-@Api(tags = "products")
+@Tag(name = "products")
 public class ProductController {
 
   private final ProductService service;
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getAllProducts", notes = "Returns all products")
+  @Operation(summary = "getAllProducts", description = "Returns all products")
   public Page<Product> getProducts(
       @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false, defaultValue = "0") int page,
@@ -44,7 +45,7 @@ public class ProductController {
   }
 
   @GetMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getProductById", notes = "Returns product by id")
+  @Operation(summary = "getProductById", description = "Returns product by id")
   public Product getById(@PathVariable Long productId) {
     return service.findProductById(productId);
   }
@@ -54,7 +55,8 @@ public class ProductController {
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
-  @ApiOperation(value = "createProduct", notes = "Create product")
+  @Operation(summary = "createProduct", description = "Create product")
+  @SecurityRequirement(name = "Bearer Authentication")
   public Product create(
       @RequestBody @Valid ProductCreateRequest productCreateRequest,
       BindingResult bindingResult) {
@@ -66,7 +68,8 @@ public class ProductController {
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
-  @ApiOperation(value = "updateProductById", notes = "Updates product fields by product id")
+  @Operation(summary = "updateProductById", description = "Updates product fields by product id")
+  @SecurityRequirement(name = "Bearer Authentication")
   public Product update(
       @PathVariable Long productId,
       @RequestBody @Valid ProductUpdateRequest productUpdateRequest,

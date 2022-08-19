@@ -9,8 +9,10 @@ import com.shalhlad.product_delivery_service.dto.response.OrderDetailsResponse;
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.service.MyService;
 import com.shalhlad.product_delivery_service.util.Utils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.security.Principal;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,31 +28,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@RequestMapping("/my")
+@RequestMapping("/${apiPrefix}/my")
 @PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
-@Api(tags = "my")
+@Tag(name = "my")
+@SecurityRequirement(name = "Bearer Authentication")
 public class MyController {
 
   private final MyService service;
 
   @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getProfileDetailsOfAuthorizedUser",
-      notes = "Returns profile information of authorized user")
-  public UserDetailsResponse getProfileDetailsOfAuthorizedUser(@ApiIgnore Principal principal) {
+  @Operation(summary = "getProfileDetailsOfAuthorizedUser",
+      description = "Returns profile information of authorized user")
+  public UserDetailsResponse getProfileDetailsOfAuthorizedUser(
+      @Parameter(hidden = true) Principal principal) {
     return service.getDetailsOfAuthorizedUser(principal);
   }
 
   @PatchMapping(value = "/user",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "updateProfileDetailsOfAuthorizedUser",
-      notes = "Update profile fields")
+  @Operation(summary = "updateProfileDetailsOfAuthorizedUser",
+      description = "Update profile fields")
   public UserDetailsResponse updateProfileDetailsOfAuthorizedUser(
-      @ApiIgnore Principal principal,
+      @Parameter(hidden = true) Principal principal,
       @RequestBody @Valid UserDetailsUpdateRequest userDetailsUpdateRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
@@ -58,9 +61,10 @@ public class MyController {
   }
 
   @GetMapping(value = "/orders", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getOrdersOfAuthorizedUser", notes = "Returns orders created by authorized user")
+  @Operation(summary = "getOrdersOfAuthorizedUser",
+      description = "Returns orders created by authorized user")
   public Page<OrderDetailsResponse> getOrdersOfAuthorizedUser(
-      @ApiIgnore Principal principal,
+      @Parameter(hidden = true) Principal principal,
       @RequestParam(required = false, defaultValue = "false") boolean active,
       @RequestParam(required = false, defaultValue = "0") int page,
       @RequestParam(required = false, defaultValue = "15") int size) {
@@ -68,25 +72,29 @@ public class MyController {
   }
 
   @GetMapping(value = "/orders/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getOrderOfAuthorizedUserByOrderId", notes = "Returns order created by authorized user by orderId")
-  public OrderDetailsResponse getOrderOfAuthorizedUserByOrderId(@ApiIgnore Principal principal,
+  @Operation(summary = "getOrderOfAuthorizedUserByOrderId",
+      description = "Returns order created by authorized user by orderId")
+  public OrderDetailsResponse getOrderOfAuthorizedUserByOrderId(
+      @Parameter(hidden = true) Principal principal,
       @PathVariable Long orderId) {
     return service.getOrderOfAuthorizedUserByOrderId(principal, orderId);
   }
 
   @GetMapping(value = "/department", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getDepartmentOfAuthorizedEmployee", notes = "Returns department of authorized employee")
+  @Operation(summary = "getDepartmentOfAuthorizedEmployee",
+      description = "Returns department of authorized employee")
   @PreAuthorize("hasAnyRole({'DEPARTMENT_HEAD', 'COURIER', 'COLLECTOR', 'WAREHOUSEMAN'})")
   public DepartmentDetailsResponse getDepartmentOfAuthorizedEmployee(
-      @ApiIgnore Principal principal) {
+      @Parameter(hidden = true) Principal principal) {
     return service.getDepartmentOfAuthorizedUser(principal);
   }
 
   @GetMapping(value = "/department/orders", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getOrdersOfAuthorizedEmployeeDepartment", notes = "Returns orders that can be processed or already processing by authorized employee")
+  @Operation(summary = "getOrdersOfAuthorizedEmployeeDepartment",
+      description = "Returns orders that can be processed or already processing by authorized employee")
   @PreAuthorize("hasAnyRole({'DEPARTMENT_HEAD', 'COURIER', 'COLLECTOR', 'WAREHOUSEMAN'})")
   public Iterable<OrderDetailsResponse> getOrdersOfAuthorizedEmployeeDepartment(
-      @ApiIgnore Principal principal,
+      @Parameter(hidden = true) Principal principal,
       @RequestParam ProcessingOrderCharacteristics orderCharacteristic,
       @RequestParam(required = false, defaultValue = "0") int page,
       @RequestParam(required = false, defaultValue = "15") int size
@@ -97,9 +105,10 @@ public class MyController {
 
   @GetMapping(value = "/department/employees", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole({'DEPARTMENT_HEAD', 'COURIER', 'COLLECTOR', 'WAREHOUSEMAN'})")
-  @ApiOperation(value = "getEmployeesOfAuthorizedEmployeeDepartment", notes = "Returns employees of authorized employee department")
+  @Operation(summary = "getEmployeesOfAuthorizedEmployeeDepartment",
+      description = "Returns employees of authorized employee department")
   public Iterable<EmployeeDetailsResponse> getEmployeesOfAuthorizedEmployeeDepartment(
-      @ApiIgnore Principal principal,
+      @Parameter(hidden = true) Principal principal,
       @RequestParam(required = false) EmployeeRoles employeeRole) {
     return service.getEmployeesOfAuthorizedUserDepartment(principal, employeeRole);
   }

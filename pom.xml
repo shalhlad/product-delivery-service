@@ -21,7 +21,7 @@
     <java.version>17</java.version>
     <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
     <org.projectlombok.version>1.18.24</org.projectlombok.version>
-    <io.springfox.version>3.0.0</io.springfox.version>
+    <org.springdoc.version>1.6.9</org.springdoc.version>
   </properties>
 
   <build>
@@ -133,9 +133,9 @@
     </dependency>
 
     <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-boot-starter</artifactId>
-      <version>${io.springfox.version}</version>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-ui</artifactId>
+      <version>${org.springdoc.version}</version>
     </dependency>
 
   </dependencies>

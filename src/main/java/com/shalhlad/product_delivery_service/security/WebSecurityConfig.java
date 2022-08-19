@@ -40,13 +40,13 @@ public class WebSecurityConfig {
             .antMatchers(HttpMethod.POST,
                 SecurityConstants.SIGN_UP_URL, SecurityConstants.SIGN_IN_URL).permitAll()
             .antMatchers(HttpMethod.GET,
-                "/products/**", "/departments/**", "/categories/**").permitAll()
-            .antMatchers("/v3/api-docs",
-                "/configuration/ui",
-                "/swagger-resources/**",
-                "/configuration/security",
+                "/api/v1/products/**", "/api/v1/departments/**", "/api/v1/categories/**")
+            .permitAll()
+            .antMatchers(
+                "/v3/api-docs/**",
                 "/swagger-ui/**",
-                "/webjars/**").permitAll()
+                "/swagger-ui.html"
+            ).permitAll()
             .anyRequest().authenticated()
         )
         .exceptionHandling(handling -> handling

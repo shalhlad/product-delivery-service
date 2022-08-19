@@ -6,8 +6,8 @@ import com.shalhlad.product_delivery_service.dto.response.AccessTokenResponse;
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.service.AuthService;
 import com.shalhlad.product_delivery_service.util.Utils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/${apiPrefix}/auth")
 @RequiredArgsConstructor
-@Api(tags = "auth")
+@Tag(name = "auth")
 public class AuthController {
 
   private final AuthService service;
@@ -31,7 +31,7 @@ public class AuthController {
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
-  @ApiOperation(value = "signUp", notes = "Sign up user")
+  @Operation(summary = "signUp", description = "Sign up user")
   public UserDetailsResponse signUp(
       @RequestBody @Valid SignUpRequest signUpRequest,
       BindingResult bindingResult) {
@@ -42,7 +42,7 @@ public class AuthController {
   @PostMapping(value = "/sign-in",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "signIn", notes = "Returns auth token")
+  @Operation(summary = "signIn", description = "Returns auth token")
   public AccessTokenResponse signIn(
       @RequestBody @Valid UserLoginRequest userLoginRequest,
       BindingResult bindingResult) {

@@ -6,8 +6,10 @@ import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsRespons
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.service.EmployeeService;
 import com.shalhlad.product_delivery_service.util.Utils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.security.Principal;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +27,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@RequestMapping("/employees")
+@RequestMapping("/${apiPrefix}/employees")
 @RequiredArgsConstructor
-@Api(tags = "employees")
+@Tag(name = "employees")
+@SecurityRequirement(name = "Bearer Authentication")
 public class EmployeeController {
 
   private final EmployeeService service;
@@ -40,10 +42,10 @@ public class EmployeeController {
       consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
-  @ApiOperation(value = "recruitUser",
-      notes = "Makes customer the employee of authorized employee department")
+  @Operation(summary = "recruitUser",
+      description = "Makes customer the employee of authorized employee department")
   public EmployeeDetailsResponse recruitUser(
-      @ApiIgnore Principal principal,
+      @Parameter(hidden = true) Principal principal,
       @RequestBody @Valid UserRecruitRequest userRecruitRequest,
       BindingResult bindingResult) {
     Utils.throwExceptionIfFailedValidation(bindingResult);
@@ -52,19 +54,19 @@ public class EmployeeController {
 
   @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
-  @ApiOperation(value = "getEmployeeByUserId", notes = "Returns employee by userId")
+  @Operation(summary = "getEmployeeByUserId", description = "Returns employee by userId")
   public EmployeeDetailsResponse getEmployeeByUserId(
-      @ApiIgnore Principal principal,
+      @Parameter(hidden = true) Principal principal,
       @PathVariable String userId) {
     return service.findEmployeeByUserId(principal, userId);
   }
 
   @PatchMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
-  @ApiOperation(value = "changeEmployeePositionByUserId",
-      notes = "Change employee position of authorized employee department")
+  @Operation(summary = "changeEmployeePositionByUserId",
+      description = "Change employee position of authorized employee department")
   public EmployeeDetailsResponse changeEmployeeRole(
-      @ApiIgnore Principal principal,
+      @Parameter(hidden = true) Principal principal,
       @PathVariable String userId,
       @RequestParam EmployeeRoles role) {
     return service.changeRoleOfEmployee(principal, userId, role);
@@ -72,9 +74,10 @@ public class EmployeeController {
 
   @DeleteMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
-  @ApiOperation(value = "fireEmployeeByUserId",
-      notes = "Fire employee of authorized employee department by userId")
-  public UserDetailsResponse fireEmployee(@ApiIgnore Principal principal,
+  @Operation(summary = "fireEmployeeByUserId",
+      description = "Fire employee of authorized employee department by userId")
+  public UserDetailsResponse fireEmployee(
+      @Parameter(hidden = true) Principal principal,
       @PathVariable String userId) {
     return service.fireEmployeeByUserId(principal, userId);
   }

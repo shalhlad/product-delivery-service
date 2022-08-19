@@ -2,8 +2,8 @@ package com.shalhlad.product_delivery_service.controller;
 
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,16 +16,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/${apiPrefix}/users")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
-@Api(tags = "users")
+@Tag(name = "users")
 public class UserController {
 
   private final UserService service;
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getAllUsers", notes = "Returns all users")
+  @Operation(summary = "getAllUsers", description = "Returns all users")
   public Page<UserDetailsResponse> getUsers(
       @RequestParam(required = false, defaultValue = "0") int page,
       @RequestParam(required = false, defaultValue = "15") int size
@@ -34,7 +34,7 @@ public class UserController {
   }
 
   @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getUserByUserId", notes = "Returns user by userId")
+  @Operation(summary = "getUserByUserId", description = "Returns user by userId")
   public UserDetailsResponse getByUserId(@PathVariable String userId) {
     return service.findUserByUserId(userId);
   }

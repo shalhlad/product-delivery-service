@@ -2,8 +2,9 @@ package com.shalhlad.product_delivery_service.controller;
 
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.service.DbEditorService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,34 +17,35 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/db-editors")
+@RequestMapping("/${apiPrefix}/db-editors")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
-@Api(tags = "db-editors")
+@Tag(name = "db-editors")
+@SecurityRequirement(name = "Bearer Authentication")
 public class DbEditorController {
 
   private final DbEditorService service;
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getAllDbEditors", notes = "Returns all DB editors")
+  @Operation(summary = "getAllDbEditors", description = "Returns all DB editors")
   public Iterable<UserDetailsResponse> getAll() {
     return service.findAllDbEditors();
   }
 
   @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "getDbEditorByUserId", notes = "Returns DB editor by userId")
+  @Operation(summary = "getDbEditorByUserId", description = "Returns DB editor by userId")
   public UserDetailsResponse getByUserId(@PathVariable String userId) {
     return service.findDbEditorByUserId(userId);
   }
 
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "addDbEditorByUserId", notes = "Makes customer the DB editor by userId")
+  @Operation(summary = "addDbEditorByUserId", description = "Makes customer the DB editor by userId")
   public UserDetailsResponse add(@RequestParam String userId) {
     return service.addDbEditor(userId);
   }
 
   @DeleteMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation(value = "removeDbEditorByUserId", notes = "Makes DB editor the customer by userId")
+  @Operation(summary = "removeDbEditorByUserId", description = "Makes DB editor the customer by userId")
   public UserDetailsResponse remove(@PathVariable String userId) {
     return service.removeDbEditor(userId);
   }
