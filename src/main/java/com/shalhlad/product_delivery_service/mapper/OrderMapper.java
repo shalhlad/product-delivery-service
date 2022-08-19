@@ -14,7 +14,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 @Mapper(uses = {UserMapper.class, DepartmentMapper.class})
 public abstract class OrderMapper {
@@ -29,8 +28,7 @@ public abstract class OrderMapper {
   public abstract List<OrderDetailsResponse> toDetailsResponse(Iterable<Order> orders);
 
   public Page<OrderDetailsResponse> toDetailsResponse(Page<Order> orders) {
-    List<OrderDetailsResponse> mappedContent = toDetailsResponse(orders.getContent());
-    return new PageImpl<>(mappedContent, orders.getPageable(), orders.getTotalElements());
+    return orders.map(this::toDetailsResponse);
   }
 
 

@@ -12,7 +12,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 @Mapper
 public abstract class UserMapper {
@@ -22,8 +21,7 @@ public abstract class UserMapper {
   public abstract List<UserDetailsResponse> toDetailsResponse(Iterable<User> users);
 
   public Page<UserDetailsResponse> toDetailsResponse(Page<User> users) {
-    List<UserDetailsResponse> mappedContent = toDetailsResponse(users.getContent());
-    return new PageImpl<>(mappedContent, users.getPageable(), users.getTotalElements());
+    return users.map(this::toDetailsResponse);
   }
 
   @Mapping(target = "department", ignore = true)
