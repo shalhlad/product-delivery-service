@@ -36,14 +36,14 @@ public class MyController {
 
   private final MyService service;
 
-  @GetMapping
+  @GetMapping("/user")
   @ApiOperation(value = "getProfileDetailsOfAuthorizedUser",
       notes = "Returns profile information of authorized user")
   public UserDetailsResponse getProfileDetailsOfAuthorizedUser(@ApiIgnore Principal principal) {
     return service.getDetailsOfAuthorizedUser(principal);
   }
 
-  @PatchMapping
+  @PatchMapping("/user")
   @ApiOperation(value = "updateProfileDetailsOfAuthorizedUser",
       notes = "Update profile fields")
   public UserDetailsResponse updateProfileDetailsOfAuthorizedUser(

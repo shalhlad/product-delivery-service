@@ -37,7 +37,7 @@ public class SwaggerConfig {
         "REST API for product delivery service",
         "1.0",
         null,
-        new Contact("Kiryl Shakhnitski", "https://github.com/shalhlad", "shakhlad26@gmail.com.com"),
+        new Contact("Kiryl", "https://github.com/shalhlad", "shakhlad26@gmail.com"),
         null,
         null,
         Collections.emptyList());

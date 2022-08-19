@@ -47,10 +47,7 @@ public class MyServiceImpl implements MyService {
   @Override
   public UserDetailsResponse getDetailsOfAuthorizedUser(Principal principal) {
     User user = userRepository.findByEmail(principal.getName()).orElseThrow();
-    if (user.getRole().isEmployee()) {
-      user = employeeRepository.findById(user.getId()).orElseThrow();
-    }
-    return mapUser(user);
+    return userMapper.toDetailsResponse(user);
   }
 
   @Override
@@ -58,16 +55,10 @@ public class MyServiceImpl implements MyService {
       UserDetailsUpdateRequest userDetailsUpdateRequest) {
     User user = userRepository.findByEmail(principal.getName()).orElseThrow();
 
-    User saved;
-    if (user.getRole().isEmployee()) {
-      user = employeeRepository.findById(user.getId()).orElseThrow();
-      userMapper.update(user, userDetailsUpdateRequest);
-      saved = employeeRepository.save((Employee) user);
-    } else {
-      userMapper.update(user, userDetailsUpdateRequest);
-      saved = userRepository.save(user);
-    }
-    return mapUser(saved);
+    userMapper.update(user, userDetailsUpdateRequest);
+
+    User saved = employeeRepository.save((Employee) user);
+    return userMapper.toDetailsResponse(saved);
   }
 
   @Override
@@ -143,12 +134,5 @@ public class MyServiceImpl implements MyService {
         employeeRepository.findAllByDepartment(department) :
         employeeRepository.findAllByDepartmentAndRole(department, employeeRole.toEntityRole());
     return employeeMapper.toDetailsResponse(employees);
-  }
-
-
-  private UserDetailsResponse mapUser(User user) {
-    return user.getRole().isEmployee() ?
-        employeeMapper.toDetailsResponse((Employee) user) :
-        userMapper.toDetailsResponse(user);
   }
 }
