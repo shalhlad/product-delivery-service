@@ -57,7 +57,7 @@ public class MyServiceImpl implements MyService {
 
     userMapper.update(user, userDetailsUpdateRequest);
 
-    User saved = employeeRepository.save((Employee) user);
+    User saved = userRepository.save(user);
     return userMapper.toDetailsResponse(saved);
   }
 
