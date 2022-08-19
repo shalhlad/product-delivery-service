@@ -1,6 +1,5 @@
 package com.shalhlad.product_delivery_service.security.jwt;
 
-import com.shalhlad.product_delivery_service.security.SecurityConstants;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -21,6 +20,8 @@ public class JwtFilter extends GenericFilterBean {
 
   private final UserDetailsService userDetailsService;
   private final JwtProvider jwtProvider;
+
+  private static final String BEARER_PREFIX = "Bearer ";
 
   @Autowired
   public JwtFilter(UserDetailsService userDetailsService, JwtProvider jwtProvider) {
@@ -45,8 +46,8 @@ public class JwtFilter extends GenericFilterBean {
   private String getTokenFromRequest(HttpServletRequest request) {
     String header = request.getHeader(HttpHeaders.AUTHORIZATION);
     String token = null;
-    if (header != null && header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
-      token = header.replace(SecurityConstants.TOKEN_PREFIX, "");
+    if (header != null && header.startsWith(BEARER_PREFIX)) {
+      token = header.replace(BEARER_PREFIX, "");
     }
     return token;
   }

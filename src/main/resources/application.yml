@@ -17,8 +17,9 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
-apiPrefix: /api/v1
-
-jwt:
-  secret: Minsk
-  expiration-days: 10
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+    tags-sorter: alpha
+    operations-sorter: alpha
+    displayRequestDuration: true
