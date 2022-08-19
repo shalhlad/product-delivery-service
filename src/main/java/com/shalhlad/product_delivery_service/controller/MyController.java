@@ -7,7 +7,7 @@ import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsRespo
 import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
 import com.shalhlad.product_delivery_service.dto.response.OrderDetailsResponse;
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
-import com.shalhlad.product_delivery_service.service.MeService;
+import com.shalhlad.product_delivery_service.service.MyService;
 import com.shalhlad.product_delivery_service.util.Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,13 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@RequestMapping("/me")
+@RequestMapping("/my")
 @PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
-@Api(tags = "me")
-public class MeController {
+@Api(tags = "my")
+public class MyController {
 
-  private final MeService service;
+  private final MyService service;
 
   @GetMapping
   @ApiOperation(value = "getProfileDetailsOfAuthorizedUser",

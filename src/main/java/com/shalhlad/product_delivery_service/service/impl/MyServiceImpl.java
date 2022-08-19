@@ -23,7 +23,7 @@ import com.shalhlad.product_delivery_service.mapper.UserMapper;
 import com.shalhlad.product_delivery_service.repository.EmployeeRepository;
 import com.shalhlad.product_delivery_service.repository.OrderRepository;
 import com.shalhlad.product_delivery_service.repository.UserRepository;
-import com.shalhlad.product_delivery_service.service.MeService;
+import com.shalhlad.product_delivery_service.service.MyService;
 import java.security.Principal;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class MeServiceImpl implements MeService {
+public class MyServiceImpl implements MyService {
 
   private final UserMapper userMapper;
   private final EmployeeMapper employeeMapper;

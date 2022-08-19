@@ -11,7 +11,7 @@ import java.security.Principal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface MeService {
+public interface MyService {
 
   UserDetailsResponse getDetailsOfAuthorizedUser(Principal principal);
 
