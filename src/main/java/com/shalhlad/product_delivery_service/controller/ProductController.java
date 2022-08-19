@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,7 @@ public class ProductController {
 
   private final ProductService service;
 
-  @GetMapping
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getAllProducts", notes = "Returns all products")
   public Page<Product> getProducts(
       @RequestParam(required = false) Long categoryId,
@@ -42,13 +43,15 @@ public class ProductController {
     return service.findAllProducts(categoryId, PageRequest.of(page, size));
   }
 
-  @GetMapping("/{productId}")
+  @GetMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getProductById", notes = "Returns product by id")
   public Product getById(@PathVariable Long productId) {
     return service.findProductById(productId);
   }
 
-  @PostMapping
+  @PostMapping(
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   @ApiOperation(value = "createProduct", notes = "Create product")
@@ -59,7 +62,9 @@ public class ProductController {
     return service.createProduct(productCreateRequest);
   }
 
-  @PatchMapping("/{productId}")
+  @PatchMapping(value = "/{productId}",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   @ApiOperation(value = "updateProductById", notes = "Updates product fields by product id")
   public Product update(

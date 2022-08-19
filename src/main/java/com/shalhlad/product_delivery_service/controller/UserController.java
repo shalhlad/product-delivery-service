@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +24,7 @@ public class UserController {
 
   private final UserService service;
 
-  @GetMapping
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getAllUsers", notes = "Returns all users")
   public Page<UserDetailsResponse> getUsers(
       @RequestParam(required = false, defaultValue = "0") int page,
@@ -32,7 +33,7 @@ public class UserController {
     return service.findAllUsers(PageRequest.of(page, size));
   }
 
-  @GetMapping("/{userId}")
+  @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getUserByUserId", notes = "Returns user by userId")
   public UserDetailsResponse getByUserId(@PathVariable String userId) {
     return service.findUserByUserId(userId);

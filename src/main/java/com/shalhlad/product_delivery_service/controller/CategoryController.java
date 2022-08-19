@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,19 +31,21 @@ public class CategoryController {
 
   private final CategoryService service;
 
-  @GetMapping
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getAllCategories", notes = "Returns all categories")
   public Iterable<Category> getAll() {
     return service.findAllCategories();
   }
 
-  @GetMapping("/{categoryId}")
+  @GetMapping(value = "/{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getCategoryById", notes = "Returns category by id")
   public Category getById(@PathVariable Long categoryId) {
     return service.findCategoryById(categoryId);
   }
 
-  @PostMapping
+  @PostMapping(
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   @ApiOperation(value = "createCategory", notes = "Creates category")
@@ -53,7 +56,9 @@ public class CategoryController {
     return service.createCategory(categoryCreateRequest);
   }
 
-  @PatchMapping("/{categoryId}")
+  @PatchMapping(value = "/{categoryId}",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   @ApiOperation(value = "updateCategoryById", notes = "Updates category fields")
   public Category update(

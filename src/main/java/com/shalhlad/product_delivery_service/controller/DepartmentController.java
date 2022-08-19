@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,19 +35,21 @@ public class DepartmentController {
 
   private final DepartmentService service;
 
-  @GetMapping("/{departmentId}")
+  @GetMapping(value = "/{departmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getDepartmentById", notes = "Returns department by id")
   public DepartmentDetailsResponse getById(@PathVariable Long departmentId) {
     return service.findDepartmentById(departmentId);
   }
 
-  @GetMapping
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getAllDepartments", notes = "Returns all departments")
   public Iterable<DepartmentDetailsResponse> getAll() {
     return service.findAllDepartments();
   }
 
-  @PostMapping
+  @PostMapping(
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   @ApiOperation(value = "createDepartment", notes = "Creates department")
@@ -57,7 +60,9 @@ public class DepartmentController {
     return service.createDepartment(departmentCreateRequest);
   }
 
-  @PatchMapping("/{departmentId}")
+  @PatchMapping(value = "/{departmentId}",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole({'DB_EDITOR', 'ADMIN'})")
   @ApiOperation(value = "updateDepartmentById", notes = "Update department fields by departmentId")
   public DepartmentDetailsResponse update(
@@ -68,14 +73,16 @@ public class DepartmentController {
     return service.updateDepartmentDetails(departmentId, departmentUpdateRequest);
   }
 
-  @GetMapping("/{departmentId}/warehouse")
+  @GetMapping(value = "/{departmentId}/warehouse", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getDepartmentWithWarehouseByDepartmentId", notes = "Returns department with warehouse by departmentId")
   public DepartmentDetailsWithWarehouseResponse getWithWarehouseById(
       @PathVariable Long departmentId) {
     return service.getDepartmentWithWarehouse(departmentId);
   }
 
-  @PatchMapping("/{departmentId}/warehouse")
+  @PatchMapping(value = "/{departmentId}/warehouse",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('WAREHOUSEMAN')")
   @ApiOperation(value = "updateProductQuantityInDepartmentWarehouseByDepartmentId",
       notes = "Updates quantity of products in department's warehouse by department id")
@@ -87,7 +94,7 @@ public class DepartmentController {
     return service.changeProductQuantityInDepartment(departmentId, productQuantityChangeRequest);
   }
 
-  @GetMapping("/{departmentId}/employees")
+  @GetMapping(value = "/{departmentId}/employees", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
   @ApiOperation(value = "getEmployeesOfDepartmentByDepartmentId", notes = "Returns employees of department by departmentId")
   public Iterable<EmployeeDetailsResponse> getEmployeesOfDepartmentById(

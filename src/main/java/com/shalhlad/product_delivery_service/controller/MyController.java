@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,14 +37,16 @@ public class MyController {
 
   private final MyService service;
 
-  @GetMapping("/user")
+  @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getProfileDetailsOfAuthorizedUser",
       notes = "Returns profile information of authorized user")
   public UserDetailsResponse getProfileDetailsOfAuthorizedUser(@ApiIgnore Principal principal) {
     return service.getDetailsOfAuthorizedUser(principal);
   }
 
-  @PatchMapping("/user")
+  @PatchMapping(value = "/user",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "updateProfileDetailsOfAuthorizedUser",
       notes = "Update profile fields")
   public UserDetailsResponse updateProfileDetailsOfAuthorizedUser(
@@ -54,7 +57,7 @@ public class MyController {
     return service.updateDetailsOfAuthorizedUser(principal, userDetailsUpdateRequest);
   }
 
-  @GetMapping("/orders")
+  @GetMapping(value = "/orders", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getOrdersOfAuthorizedUser", notes = "Returns orders created by authorized user")
   public Page<OrderDetailsResponse> getOrdersOfAuthorizedUser(
       @ApiIgnore Principal principal,
@@ -63,14 +66,14 @@ public class MyController {
     return service.getOrdersOfAuthorizedUser(principal, PageRequest.of(page, size));
   }
 
-  @GetMapping("/orders/{orderId}")
+  @GetMapping(value = "/orders/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getOrderOfAuthorizedUserByOrderId", notes = "Returns order created by authorized user by orderId")
   public OrderDetailsResponse getOrderOfAuthorizedUserByOrderId(@ApiIgnore Principal principal,
       @PathVariable Long orderId) {
     return service.getOrderOfAuthorizedUserByOrderId(principal, orderId);
   }
 
-  @GetMapping("/department")
+  @GetMapping(value = "/department", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getDepartmentOfAuthorizedEmployee", notes = "Returns department of authorized employee")
   @PreAuthorize("hasAnyRole({'DEPARTMENT_HEAD', 'COURIER', 'COLLECTOR', 'WAREHOUSEMAN'})")
   public DepartmentDetailsResponse getDepartmentOfAuthorizedEmployee(
@@ -78,7 +81,7 @@ public class MyController {
     return service.getDepartmentOfAuthorizedUser(principal);
   }
 
-  @GetMapping("/department/orders")
+  @GetMapping(value = "/department/orders", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getOrdersOfAuthorizedEmployeeDepartment", notes = "Returns orders that can be processed or already processing by authorized employee")
   @PreAuthorize("hasAnyRole({'DEPARTMENT_HEAD', 'COURIER', 'COLLECTOR', 'WAREHOUSEMAN'})")
   public Iterable<OrderDetailsResponse> getOrdersOfAuthorizedEmployeeDepartment(
@@ -91,7 +94,7 @@ public class MyController {
         PageRequest.of(page, size));
   }
 
-  @GetMapping("/department/employees")
+  @GetMapping(value = "/department/employees", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole({'DEPARTMENT_HEAD', 'COURIER', 'COLLECTOR', 'WAREHOUSEMAN'})")
   @ApiOperation(value = "getEmployeesOfAuthorizedEmployeeDepartment", notes = "Returns employees of authorized employee department")
   public Iterable<EmployeeDetailsResponse> getEmployeesOfAuthorizedEmployeeDepartment(

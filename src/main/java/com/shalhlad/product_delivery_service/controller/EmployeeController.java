@@ -12,6 +12,7 @@ import java.security.Principal;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,7 +35,9 @@ public class EmployeeController {
 
   private final EmployeeService service;
 
-  @PostMapping
+  @PostMapping(
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   @ApiOperation(value = "recruitUser",
@@ -47,7 +50,7 @@ public class EmployeeController {
     return service.recruitUser(principal, userRecruitRequest);
   }
 
-  @GetMapping("/{userId}")
+  @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
   @ApiOperation(value = "getEmployeeByUserId", notes = "Returns employee by userId")
   public EmployeeDetailsResponse getEmployeeByUserId(
@@ -56,7 +59,7 @@ public class EmployeeController {
     return service.findEmployeeByUserId(principal, userId);
   }
 
-  @PatchMapping("/{userId}")
+  @PatchMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('DEPARTMENT_HEAD')")
   @ApiOperation(value = "changeEmployeePositionByUserId",
       notes = "Change employee position of authorized employee department")
@@ -67,7 +70,7 @@ public class EmployeeController {
     return service.changeRoleOfEmployee(principal, userId, role);
   }
 
-  @DeleteMapping("/{userId}")
+  @DeleteMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole({'ADMIN', 'DEPARTMENT_HEAD'})")
   @ApiOperation(value = "fireEmployeeByUserId",
       notes = "Fire employee of authorized employee department by userId")

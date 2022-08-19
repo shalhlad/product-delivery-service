@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +27,9 @@ public class AuthController {
 
   private final AuthService service;
 
-  @PostMapping("/sign-up")
+  @PostMapping(value = "/sign-up",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @ApiOperation(value = "signUp", notes = "Sign up user")
   public UserDetailsResponse signUp(
@@ -36,7 +39,9 @@ public class AuthController {
     return service.signUp(signUpRequest);
   }
 
-  @PostMapping("/sign-in")
+  @PostMapping(value = "/sign-in",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "signIn", notes = "Returns auth token")
   public AccessTokenResponse signIn(
       @RequestBody @Valid UserLoginRequest userLoginRequest,

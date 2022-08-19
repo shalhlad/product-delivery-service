@@ -11,6 +11,7 @@ import java.security.Principal;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +32,7 @@ public class OrderController {
 
   private final OrderService service;
 
-  @GetMapping("/orders/{orderId}")
+  @GetMapping(value = "/orders/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "getOrderById", notes = "Returns order by id")
   public OrderDetailsResponse getById(
       @ApiIgnore Principal principal,
@@ -39,7 +40,9 @@ public class OrderController {
     return service.findOrderById(orderId, principal);
   }
 
-  @PostMapping("/orders")
+  @PostMapping(value = "/orders",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @ApiOperation(value = "createOrder", notes = "Create order")
   public OrderDetailsResponse create(
@@ -50,7 +53,7 @@ public class OrderController {
     return service.createOrder(principal, orderCreateRequest);
   }
 
-  @PatchMapping("/orders/{orderId}")
+  @PatchMapping(value = "/orders/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "applyOperationToOrderById", notes = "Applies an operation on order by orderId")
   public OrderDetailsResponse applyOperation(
       @ApiIgnore Principal principal,
