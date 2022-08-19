@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/${apiPrefix}/auth")
+@RequestMapping("${apiPrefix}/auth")
 @RequiredArgsConstructor
 @Tag(name = "auth")
 public class AuthController {

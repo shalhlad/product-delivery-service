@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/${apiPrefix}/employees")
+@RequestMapping("${apiPrefix}/employees")
 @RequiredArgsConstructor
 @Tag(name = "employees")
 @SecurityRequirement(name = "Bearer Authentication")

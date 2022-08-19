@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/${apiPrefix}/orders")
+@RequestMapping("${apiPrefix}/orders")
 @PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
 @Tag(name = "orders")

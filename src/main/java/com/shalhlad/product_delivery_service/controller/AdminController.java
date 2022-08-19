@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @PreAuthorize("hasRole('ADMIN')")
-@RequestMapping("/${apiPrefix}/admins")
+@RequestMapping("${apiPrefix}/admins")
 @RequiredArgsConstructor
 @Tag(name = "admins")
 @SecurityRequirement(name = "Bearer Authentication")

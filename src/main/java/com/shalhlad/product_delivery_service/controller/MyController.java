@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/${apiPrefix}/my")
+@RequestMapping("${apiPrefix}/my")
 @PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
 @Tag(name = "my")

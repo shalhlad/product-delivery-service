@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/${apiPrefix}/departments")
+@RequestMapping("${apiPrefix}/departments")
 @RequiredArgsConstructor
 @Tag(name = "departments")
 public class DepartmentController {
