@@ -2,6 +2,7 @@ package com.shalhlad.product_delivery_service.controller;
 
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.service.AdminService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/admins")
 @RequiredArgsConstructor
+@Api(tags = "admins")
 public class AdminController {
 
   private final AdminService service;

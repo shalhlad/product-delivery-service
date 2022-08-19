@@ -5,6 +5,7 @@ import com.shalhlad.product_delivery_service.dto.request.OrderOperations;
 import com.shalhlad.product_delivery_service.dto.response.OrderDetailsResponse;
 import com.shalhlad.product_delivery_service.service.OrderService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.security.Principal;
 import javax.validation.Valid;
@@ -25,6 +26,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
+@Api(tags = "orders")
 public class OrderController {
 
   private final OrderService service;

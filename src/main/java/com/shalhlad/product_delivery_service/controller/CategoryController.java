@@ -5,6 +5,7 @@ import com.shalhlad.product_delivery_service.dto.request.CategoryUpdateRequest;
 import com.shalhlad.product_delivery_service.entity.product.Category;
 import com.shalhlad.product_delivery_service.service.CategoryService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
+@Api(tags = "categories")
 public class CategoryController {
 
   private final CategoryService service;

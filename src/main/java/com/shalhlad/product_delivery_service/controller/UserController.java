@@ -2,6 +2,7 @@ package com.shalhlad.product_delivery_service.controller;
 
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.service.UserService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
+@Api(tags = "users")
 public class UserController {
 
   private final UserService service;

@@ -9,6 +9,7 @@ import com.shalhlad.product_delivery_service.dto.response.OrderDetailsResponse;
 import com.shalhlad.product_delivery_service.dto.response.UserDetailsResponse;
 import com.shalhlad.product_delivery_service.service.MeService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.security.Principal;
 import javax.validation.Valid;
@@ -30,6 +31,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("/me")
 @PreAuthorize("isAuthenticated()")
 @RequiredArgsConstructor
+@Api(tags = "me")
 public class MeController {
 
   private final MeService service;

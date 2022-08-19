@@ -5,6 +5,7 @@ import com.shalhlad.product_delivery_service.dto.request.ProductUpdateRequest;
 import com.shalhlad.product_delivery_service.entity.product.Product;
 import com.shalhlad.product_delivery_service.service.ProductService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
+@Api(tags = "products")
 public class ProductController {
 
   private final ProductService service;

@@ -9,6 +9,7 @@ import com.shalhlad.product_delivery_service.dto.response.DepartmentDetailsWithW
 import com.shalhlad.product_delivery_service.dto.response.EmployeeDetailsResponse;
 import com.shalhlad.product_delivery_service.service.DepartmentService;
 import com.shalhlad.product_delivery_service.util.Utils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/departments")
 @RequiredArgsConstructor
+@Api(tags = "departments")
 public class DepartmentController {
 
   private final DepartmentService service;
