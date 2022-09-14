@@ -3,7 +3,7 @@
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>product_delivery_service</artifactId>
+  <artifactId>productdeliveryservice</artifactId>
   <description>Product delivery service</description>
   <groupId>com.shalhlad</groupId>
   <version>0.0.1-SNAPSHOT</version>
@@ -21,7 +21,7 @@
     <java.version>17</java.version>
     <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
     <org.projectlombok.version>1.18.24</org.projectlombok.version>
-    <org.springdoc.version>1.6.9</org.springdoc.version>
+    <org.springdoc.version>1.6.11</org.springdoc.version>
   </properties>
 
   <build>
@@ -118,6 +118,7 @@
     <dependency>
       <artifactId>postgresql</artifactId>
       <groupId>org.postgresql</groupId>
+      <version>42.5.0</version>
       <scope>runtime</scope>
     </dependency>
 
