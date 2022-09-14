@@ -1,4 +1,4 @@
-package com.shalhlad.productdeliveryservice.security.exception_handling;
+package com.shalhlad.productdeliveryservice.security.exceptionhandler;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.shalhlad.productdeliveryservice.dto.response.ErrorResponse;
