@@ -18,10 +18,10 @@ import org.springframework.web.filter.GenericFilterBean;
 @Component
 public class JwtFilter extends GenericFilterBean {
 
+  private static final String BEARER_PREFIX = "Bearer ";
+
   private final UserDetailsService userDetailsService;
   private final JwtProvider jwtProvider;
-
-  private static final String BEARER_PREFIX = "Bearer ";
 
   @Autowired
   public JwtFilter(UserDetailsService userDetailsService, JwtProvider jwtProvider) {
