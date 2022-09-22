@@ -71,6 +71,7 @@ public abstract class OrderMapper {
               product.getCategory(),
               productDetails.getPriceOfOne(),
               productDetails.getQuantity(),
+              product.getWeight(),
               productDetails.getDiscountInPercents()
           );
         })

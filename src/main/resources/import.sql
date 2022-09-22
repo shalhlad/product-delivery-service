@@ -7,17 +7,17 @@ values ('Fruit'),
        ('Bakery'),
        ('Drink');
 
-insert into products (name, price, category_id)
-values ('Mutsu apple (1kg)', 2.29, 1),
-       ('Coca-cola (0.5l)', 1.42, 7),
-       ('Fanta (1.5l)', 2.54, 7),
-       ('Bread "Vkusny" (450g)', 1.19, 6),
-       ('Frozen donut "Berlinsky" (60g)', 0.94, 3),
-       ('Chocolate nestle (82g)', 2.62, 3),
-       ('Milk "Svezhee" (1l)', 1.81, 4),
-       ('Condensed milk "Hlubokoye" (380g)', 3.22, 4),
-       ('White cabbage (1kg)', 0.85, 2),
-       ('Potato (1kg)', 1.95, 2);
+insert into products (name, price, category_id, weight)
+values ('Mutsu apple', 2.29, 1, 1000),
+       ('Coca-cola (0.5l)', 1.42, 7, 500),
+       ('Fanta (1.5l)', 2.54, 7, 1500),
+       ('Bread "Vkusny"', 1.19, 6, 450),
+       ('Frozen donut "Berlinsky"', 0.94, 3, 60),
+       ('Chocolate nestle', 2.62, 3, 82),
+       ('Milk "Svezhee" (1l)', 1.81, 4, 1000),
+       ('Condensed milk "Hlubokoye"', 3.22, 4, 380),
+       ('White cabbage', 0.85, 2, 1000),
+       ('Potato', 1.95, 2, 1000);
 
 insert into departments (address)
 values ('Minsk, ul. Bobruiskaya, 9'),

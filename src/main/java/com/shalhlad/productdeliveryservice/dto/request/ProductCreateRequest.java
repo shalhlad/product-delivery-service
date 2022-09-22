@@ -20,6 +20,10 @@ public class ProductCreateRequest {
   @Digits(integer = 5, fraction = 2, message = "Price should contain max 5 number at left of point and 2 at right")
   private BigDecimal price;
 
+  @NotNull(message = "Weight should not be null")
+  @Min(value = 1, message = "Weight should be minimum 1 gram")
+  private Integer weight;
+
   @NotNull(message = "CategoryId should not be null")
   @Min(value = 0, message = "CategoryId should be minimum 0")
   private Long categoryId;

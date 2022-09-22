@@ -30,6 +30,9 @@ public class Product {
   @Column(name = "name", unique = true, nullable = false, length = 50)
   private String name;
 
+  @Column(name = "weight", nullable = false)
+  private Integer weight;
+
   @Column(name = "price", precision = 5, scale = 2, nullable = false)
   private BigDecimal price;
 

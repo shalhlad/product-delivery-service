@@ -19,4 +19,7 @@ public class ProductUpdateRequest {
 
   @Min(value = 0, message = "CategoryId should be minimum 0")
   private Long categoryId;
+
+  @Min(value = 1, message = "Weight should be minimum 1 gram")
+  private Integer weight;
 }

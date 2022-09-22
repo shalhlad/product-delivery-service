@@ -13,8 +13,8 @@ public class ProductWithQuantityAndDiscountResponse extends ProductWithQuantityR
 
   public ProductWithQuantityAndDiscountResponse(Long id, String name,
       Category category, BigDecimal price,
-      Integer quantity, BigDecimal discountInPercents) {
-    super(id, name, category, price, quantity);
+      Integer weight, Integer quantity, BigDecimal discountInPercents) {
+    super(id, name, category, price, weight, quantity);
     this.discountInPercents = discountInPercents;
   }
 }

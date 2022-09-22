@@ -24,7 +24,8 @@ public interface ProductMapper {
       @Mapping(target = "id", ignore = true),
       @Mapping(target = "category", ignore = true),
       @Mapping(target = "name", nullValuePropertyMappingStrategy = IGNORE),
-      @Mapping(target = "price", nullValuePropertyMappingStrategy = IGNORE)
+      @Mapping(target = "price", nullValuePropertyMappingStrategy = IGNORE),
+      @Mapping(target = "weight", nullValuePropertyMappingStrategy = IGNORE)
   })
   void update(@MappingTarget Product product, ProductUpdateRequest productUpdateRequest);
 }

@@ -14,9 +14,11 @@ public class ProductWithQuantityResponse {
   private String name;
   private Category category;
   private BigDecimal price;
+  private Integer weight;
   private Integer quantity;
 
   public ProductWithQuantityResponse(Product product, Integer quantity) {
-    this(product.getId(), product.getName(), product.getCategory(), product.getPrice(), quantity);
+    this(product.getId(), product.getName(), product.getCategory(), product.getPrice(),
+        product.getWeight(), quantity);
   }
 }
