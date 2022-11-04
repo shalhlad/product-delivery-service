@@ -7,17 +7,17 @@ values ('Fruit'),
        ('Bakery'),
        ('Drink');
 
-insert into products (name, price, category_id)
-values ('Mutsu apple (1kg)', 2.29, 1),
-       ('Coca-cola (0.5l)', 1.42, 7),
-       ('Fanta (1.5l)', 2.54, 7),
-       ('Bread "Vkusny" (450g)', 1.19, 6),
-       ('Frozen donut "Berlinsky" (60g)', 0.94, 3),
-       ('Chocolate nestle (82g)', 2.62, 3),
-       ('Milk "Svezhee" (1l)', 1.81, 4),
-       ('Condensed milk "Hlubokoye" (380g)', 3.22, 4),
-       ('White cabbage (1kg)', 0.85, 2),
-       ('Potato (1kg)', 1.95, 2);
+insert into products (name, price, category_id, weight)
+values ('Mutsu apple', 2.29, 1, 1000),
+       ('Coca-cola (0.5l)', 1.42, 7, 500),
+       ('Fanta (1.5l)', 2.54, 7, 1500),
+       ('Bread "Vkusny"', 1.19, 6, 450),
+       ('Frozen donut "Berlinsky"', 0.94, 3, 60),
+       ('Chocolate nestle', 2.62, 3, 82),
+       ('Milk "Svezhee" (1l)', 1.81, 4, 1000),
+       ('Condensed milk "Hlubokoye"', 3.22, 4, 380),
+       ('White cabbage', 0.85, 2, 1000),
+       ('Potato', 1.95, 2, 1000);
 
 insert into departments (address)
 values ('Minsk, ul. Bobruiskaya, 9'),
@@ -53,20 +53,28 @@ values (1, 29, 1),
        (3, 6, 9),
        (3, 18, 10);
 
+insert into cards (discount_in_percents, number_of_orders)
+values (0.0, 0),
+       (0.0, 0),
+       (0.0, 0),
+       (0.0, 0),
+       (0.0, 0),
+       (0.0, 0);
+
 /*password is "root" for all rows */
-insert into users (email, encrypted_password, first_name, registration_date, role, user_id)
+insert into users (email, encrypted_password, first_name, registration_date, card_id, role, user_id)
 values ('admin1@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Kiryl', now(), 'ROLE_ADMIN', 'HBOpigA8m00zc5Z'),
+        'Kiryl', now(), 1, 'ROLE_ADMIN', 'HBOpigA8m00zc5Z'),
        ('admin2@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Anton', now(), 'ROLE_ADMIN', 'kiQ1s2IxzFnp86P'),
+        'Anton', now(), 2, 'ROLE_ADMIN', 'kiQ1s2IxzFnp86P'),
        ('dbeditor@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Alexei', now(), 'ROLE_DB_EDITOR', 'uXf6gx7WmC9bqAq'),
+        'Alexei', now(), 3, 'ROLE_DB_EDITOR', 'uXf6gx7WmC9bqAq'),
        ('dephead@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Mikhail', now(), 'ROLE_DEPARTMENT_HEAD', 'ed0t5iYzoCqpN5Z'),
+        'Mikhail', now(), 4, 'ROLE_DEPARTMENT_HEAD', 'ed0t5iYzoCqpN5Z'),
        ('collector1@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Denis', now(), 'ROLE_COLLECTOR', 'ccuRZwJRnySB9As'),
+        'Denis', now(), 5, 'ROLE_COLLECTOR', 'ccuRZwJRnySB9As'),
        ('courier1@test.com', '$2a$12$CdXmXIMpnyiyL8zVpbGSHu7JzpqXetT.8keWJxv7HDD9jlyAtuEpu',
-        'Nikolay', now(), 'ROLE_COURIER', 'f50jqzAEhbWbGHO');
+        'Nikolay', now(), 6, 'ROLE_COURIER', 'f50jqzAEhbWbGHO');
 
 insert into employees (id, department_id)
 values (4, 1),
